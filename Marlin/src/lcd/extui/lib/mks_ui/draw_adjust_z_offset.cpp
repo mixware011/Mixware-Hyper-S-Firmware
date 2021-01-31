@@ -50,58 +50,59 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
   if (event != LV_EVENT_RELEASED) return;
   switch (obj->mks_obj_id) {
     case ID_ADJUST_Z_ADD:
-        if (queue.length <= (BUFSIZE - 3)) {
-          if (uiCfg.leveling_first_time) {
-            if (!all_axes_trusted())
-              queue.enqueue_now_P(PSTR("G28"));
-            queue.enqueue_now_P(PSTR("G1 X150 Y150\nG1 Z0"));
-            uiCfg.leveling_first_time = 0;
-          }
-          else {
-            ZERO(public_buf_l);
-            queue.enqueue_one_P(PSTR("G91"));
-            sprintf_P(public_buf_l, PSTR("G1 Z%3.1f F%d"), uiCfg.move_dist, uiCfg.moveSpeed);
-            queue.enqueue_one_now(public_buf_l);
-            queue.enqueue_one_P(PSTR("G90"));
-            probe.offset.z += uiCfg.move_dist;
-            disp_z_offset_pos();
-          }
+      if (queue.length <= (BUFSIZE - 3)) {
+        if (uiCfg.leveling_first_time) {
+          if (!all_axes_trusted())
+            queue.enqueue_now_P(PSTR("G28"));
+          queue.enqueue_now_P(PSTR("G1 X150 Y150\nG1 Z0"));
+          uiCfg.leveling_first_time = 0;
         }
+        else {
+          ZERO(public_buf_l);
+          queue.enqueue_one_P(PSTR("G91"));
+          sprintf_P(public_buf_l, PSTR("G1 Z%3.1f F%d"), uiCfg.move_dist, uiCfg.moveSpeed);
+          queue.enqueue_one_now(public_buf_l);
+          queue.enqueue_one_P(PSTR("G90"));
+          probe.offset.z += uiCfg.move_dist;
+          disp_z_offset_pos();
+        }
+      }
       break;
     case ID_ADJUST_Z_DEC:
-        if (queue.length <= (BUFSIZE - 3)) {
-          if (uiCfg.leveling_first_time) {
-            if (!all_axes_trusted())
-              queue.enqueue_now_P(PSTR("G28"));
-            queue.enqueue_now_P(PSTR("G1 X150 Y150\nG1 Z0"));
-            uiCfg.leveling_first_time = 0;
-          }
-          else {
-            ZERO(public_buf_l);
-            queue.enqueue_one_P(PSTR("G91"));
-            sprintf_P(public_buf_l, PSTR("G1 Z-%3.1f F%d"), uiCfg.move_dist, uiCfg.moveSpeed);
-            queue.enqueue_one_now(public_buf_l);
-            queue.enqueue_one_P(PSTR("G90"));
-            probe.offset.z -= uiCfg.move_dist;
-            disp_z_offset_pos();
-          }
+      if (queue.length <= (BUFSIZE - 3)) {
+        if (uiCfg.leveling_first_time) {
+          if (!all_axes_trusted())
+            queue.enqueue_now_P(PSTR("G28"));
+          queue.enqueue_now_P(PSTR("G1 X150 Y150\nG1 Z0"));
+          uiCfg.leveling_first_time = 0;
         }
+        else {
+          ZERO(public_buf_l);
+          queue.enqueue_one_P(PSTR("G91"));
+          sprintf_P(public_buf_l, PSTR("G1 Z-%3.1f F%d"), uiCfg.move_dist, uiCfg.moveSpeed);
+          queue.enqueue_one_now(public_buf_l);
+          queue.enqueue_one_P(PSTR("G90"));
+          probe.offset.z -= uiCfg.move_dist;
+          disp_z_offset_pos();
+        }
+      }
       break;
     case ID_ADJUST_Z_SAVE:
-        lv_clear_adjust_z_offset();
-        lv_draw_dialog(DIALOG_STORE_EEPROM_TIPS);
+      lv_clear_adjust_z_offset();
+      lv_draw_dialog(DIALOG_STORE_EEPROM_TIPS);
       break;
     case ID_ADJUST_Z_STEP:
-        if (abs(10 * (int)uiCfg.move_dist) == 10)
-          uiCfg.move_dist = 0.1;
-        else
-          uiCfg.move_dist = (float)1;
+      if (abs(10 * (int)uiCfg.move_dist) == 10)
+        uiCfg.move_dist = 0.1;
+      else
+        uiCfg.move_dist = (float)1;
 
-        disp_adjust_dist();
+      disp_adjust_dist();
       break;
     case ID_ADJUST_Z_RETURN:
-        lv_clear_cur_ui();
-        lv_draw_level_select();
+      queue.inject_P(PSTR("M84"));
+      lv_clear_cur_ui();
+      lv_draw_level_select();
       break;
   }
 }
@@ -137,7 +138,6 @@ void lv_draw_adjust_z_offset(void) {
 }
 
 void disp_z_offset_pos() {
-  ZERO(public_buf_l);
   sprintf_P(public_buf_l, PSTR("%.1f"), probe.offset.z);
   lv_label_set_text(labelZ_offset, public_buf_l);
 }

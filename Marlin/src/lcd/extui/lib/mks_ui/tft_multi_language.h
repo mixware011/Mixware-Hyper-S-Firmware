@@ -290,6 +290,8 @@ typedef struct machine_common_disp{
   const char *EncoderConfText;
 
   TERN_(MIXWARE_MODEL_V, const char *RunoutConfText;)
+  TERN_(MIXWARE_MODEL_V, const char *FilamentDetTitle;)
+  TERN_(MIXWARE_MODEL_V, const char *FilamentDetPausing;)
 } machine_common_def;
 
 extern machine_common_def machine_menu;

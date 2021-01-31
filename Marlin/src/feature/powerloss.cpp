@@ -337,12 +337,12 @@ void PrintJobRecovery::resume() {
   // Restore cold extrusion permission
   TERN_(PREVENT_COLD_EXTRUSION, thermalManager.allow_cold_extrude = info.flag.allow_cold_extrusion);
 
-  #if DISABLED(MIXWARE_MODEL_V)
+  // #if DISABLED(MIXWARE_MODEL_V)
     #if HAS_LEVELING
       // Make sure leveling is off before any G92 and G28
       gcode.process_subcommands_now_P(PSTR("M420 S0 Z0"));
     #endif
-  #endif
+  // #endif
 
   #if HAS_HEATED_BED
     const int16_t bt = info.target_temperature_bed;

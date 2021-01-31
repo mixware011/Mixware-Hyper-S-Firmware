@@ -87,20 +87,20 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
         #endif
         lv_imgbtn_set_src_both(buttonPause, "F:/bmp_resume.bin");
         lv_label_set_text(labelPause, printing_menu.resume);
-        lv_obj_align(labelPause, buttonPause, LV_ALIGN_CENTER, 30, 0);
+        lv_obj_align(labelPause, buttonPause, LV_ALIGN_CENTER, 20, 0);
       }
       else if (uiCfg.print_state == PAUSED) {
         uiCfg.print_state = RESUMING;
         lv_imgbtn_set_src_both(obj, "F:/bmp_pause.bin");
         lv_label_set_text(labelPause, printing_menu.pause);
-        lv_obj_align(labelPause, buttonPause, LV_ALIGN_CENTER, 30, 0);
+        lv_obj_align(labelPause, buttonPause, LV_ALIGN_CENTER, 20, 0);
       }
       #if ENABLED(POWER_LOSS_RECOVERY)
         else if (uiCfg.print_state == REPRINTING) {
           uiCfg.print_state = REPRINTED;
           lv_imgbtn_set_src_both(obj, "F:/bmp_pause.bin");
           lv_label_set_text(labelPause, printing_menu.pause);
-          lv_obj_align(labelPause, buttonPause, LV_ALIGN_CENTER, 30, 0);
+          lv_obj_align(labelPause, buttonPause, LV_ALIGN_CENTER, 20, 0);
           print_time.minutes = recovery.info.print_job_elapsed / 60;
           print_time.seconds = recovery.info.print_job_elapsed % 60;
           print_time.hours   = print_time.minutes / 60;
@@ -118,16 +118,11 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       break;
     #if ENABLED(MIXWARE_MODEL_V)
       case ID_FILAMENT_DET:
-        if (gCfgItems.filament_det_enable) {
-          gCfgItems.filament_det_enable = false;
-          lv_label_set_text(labelDet, operation_menu.filament_sensor_off);
-          update_spi_flash();
-        }
-        else {
-          gCfgItems.filament_det_enable = true;
-          lv_label_set_text(labelDet, operation_menu.filament_sensor_on);
-          update_spi_flash();
-        }
+        gCfgItems.filament_det_enable ^= true;
+        lv_label_set_text(labelDet, gCfgItems.filament_det_enable ? operation_menu.filament_sensor_on : operation_menu.filament_sensor_off);
+        update_spi_flash();
+
+        if (gCfgItems.filament_det_enable) detector.reset();
         break;
     #endif
   }
@@ -299,6 +294,15 @@ void setProBarRate() {
       rate_tmp_r = (long long)card.getIndex();
     #endif
     rate = (rate_tmp_r - (PREVIEW_SIZE + To_pre_view)) * 100 / (gCfgItems.curFilesize - (PREVIEW_SIZE + To_pre_view));
+  }
+
+  static uint8_t last_print_state = IDLE;
+  if (last_print_state != uiCfg.print_state) {
+    last_print_state = uiCfg.print_state;
+    lv_imgbtn_set_src_both(buttonPause, uiCfg.print_state == WORKING ? "F:/bmp_pause.bin" : "F:/bmp_resume.bin");
+    lv_label_set_text(labelPause, uiCfg.print_state == WORKING ? printing_menu.pause : printing_menu.resume);
+    lv_obj_align(labelPause, buttonPause, LV_ALIGN_CENTER, 20, 0);
+        SERIAL_ECHOPAIR("\r\n : ", __FUNCTION__);
   }
 
   if (rate <= 0) return;

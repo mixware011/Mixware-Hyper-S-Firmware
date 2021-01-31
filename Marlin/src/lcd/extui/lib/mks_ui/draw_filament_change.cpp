@@ -34,6 +34,7 @@
 
 #if ENABLED(MIXWARE_MODEL_V)
   #include "../../../../sd/cardreader.h"
+  #include "../../../../feature/powerloss.h"
 
   extern bool flash_preview_begin, default_preview_flg;
 #endif
@@ -62,7 +63,12 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
     case ID_FILAMNT_IN:
       uiCfg.filament_load_heat_flg = 1;
       #if ENABLED(MIXWARE_MODEL_V)
-        if (uiCfg.print_state == WORKING) {
+        if (uiCfg.print_state == IDLE) {
+          uiCfg.leveling_first_time = 1;
+          lv_clear_filament_change();
+          lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+        }
+        else if (uiCfg.print_state == WORKING) {
           #if ENABLED(SDSUPPORT)
             card.pauseSDPrint();
             stop_print_time();
@@ -73,9 +79,8 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
           lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
         }
         else {
-          uiCfg.leveling_first_time = 1;
           lv_clear_filament_change();
-          lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+          lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_SELECT);
         }
       #else
         #if ENABLED(SINGLENOZZLE)
@@ -112,7 +117,12 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
     case ID_FILAMNT_OUT:
       uiCfg.filament_unload_heat_flg=1;
       #if ENABLED(MIXWARE_MODEL_V)
-        if (uiCfg.print_state == WORKING) {
+        if (uiCfg.print_state == IDLE) {
+          uiCfg.leveling_first_time = 1;
+          lv_clear_filament_change();
+          lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+        }
+        else if (uiCfg.print_state == WORKING) {
           #if ENABLED(SDSUPPORT)
             card.pauseSDPrint();
             stop_print_time();
@@ -123,9 +133,8 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
           lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
         }
         else {
-          uiCfg.leveling_first_time = 1;
           lv_clear_filament_change();
-          lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+          lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_SELECT);
         }
       #else
       #if ENABLED(SINGLENOZZLE)
@@ -195,18 +204,26 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       break;
     #if ENABLED(MIXWARE_MODEL_V)
       case ID_FILAMNT_RESUME:
-        feedrate_mm_s = (float)uiCfg.moveSpeed_bak;
-        planner.set_e_position_mm((destination.e = current_position.e = uiCfg.current_e_position_bak));
-        thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = uiCfg.desireSprayerTempBak;
-        if (gCfgItems.from_flash_pic == 1) {
-          flash_preview_begin = 1;
+        if (uiCfg.print_state == PAUSED) {
+          feedrate_mm_s = (float)uiCfg.moveSpeed_bak;
+          planner.set_e_position_mm((destination.e = current_position.e = uiCfg.current_e_position_bak));
+          thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = uiCfg.desireSprayerTempBak;
+          if (gCfgItems.from_flash_pic) flash_preview_begin = true;
+          else default_preview_flg = true;
+          lv_clear_cur_ui();
+          lv_draw_printing();
+          uiCfg.print_state = RESUMING;
         }
-        else {
-          default_preview_flg = 1;
+        else if (uiCfg.print_state == REPRINTING) {
+          print_time.minutes = recovery.info.print_job_elapsed / 60;
+          print_time.seconds = recovery.info.print_job_elapsed % 60;
+          print_time.hours   = print_time.minutes / 60;
+          if (gCfgItems.from_flash_pic) flash_preview_begin = true;
+          else default_preview_flg = true;
+          lv_clear_cur_ui();
+          lv_draw_printing();
+          uiCfg.print_state = REPRINTED;
         }
-        uiCfg.print_state = RESUMING;
-        lv_clear_cur_ui();
-        lv_draw_printing();
         break;
     #endif
   }
@@ -220,8 +237,8 @@ void lv_draw_filament_change(void) {
 
   lv_big_button_create(scr, "F:/img_filamentchange_out.bin", filament_menu.out, button_pixel_point[3].x, button_pixel_point[3].y, event_handler, ID_FILAMNT_OUT);
 
-  if (uiCfg.print_state == PAUSED) {
-    lv_obj_t *button_f_resume = lv_big_button_create(scr, "F:/bmp_resume.bin", printing_menu.resume,  5, 400, event_handler, ID_FILAMNT_RESUME);
+  if (uiCfg.print_state == PAUSED || uiCfg.print_state == REPRINTING) {
+    lv_obj_t *button_f_resume = lv_imgbtn_create(scr, "F:/bmp_resume.bin", 5, 400, event_handler, ID_FILAMNT_RESUME);
     lv_obj_t *label_f_resume = lv_label_create_empty(button_f_resume);
 
     lv_label_set_text(label_f_resume, printing_menu.resume);

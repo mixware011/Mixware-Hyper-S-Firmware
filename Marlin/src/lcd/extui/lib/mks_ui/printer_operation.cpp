@@ -108,12 +108,12 @@ void printer_state_polling() {
 
   if (uiCfg.print_state == RESUMING) {
     if (IS_SD_PAUSED()) {
-      if (gCfgItems.pausePosX != (float)-1) {
-        sprintf_P(public_buf_m, PSTR("G1 X%s"), dtostrf(uiCfg.current_x_position_bak, 1, 1, str_1));
-        gcode.process_subcommands_now(public_buf_m);
-      }
       if (gCfgItems.pausePosY != (float)-1) {
         sprintf_P(public_buf_m, PSTR("G1 Y%s"), dtostrf(uiCfg.current_y_position_bak, 1, 1, str_1));
+        gcode.process_subcommands_now(public_buf_m);
+      }
+      if (gCfgItems.pausePosX != (float)-1) {
+        sprintf_P(public_buf_m, PSTR("G1 X%s"), dtostrf(uiCfg.current_x_position_bak, 1, 1, str_1));
         gcode.process_subcommands_now(public_buf_m);
       }
       if (gCfgItems.pausePosZ != (float)-1) {
@@ -130,8 +130,10 @@ void printer_state_polling() {
       update_spi_flash();
 
       #if ENABLED(MIXWARE_MODEL_V)
-        lv_clear_cur_ui();
-        lv_draw_printing();
+        // if (gCfgItems.from_flash_pic) flash_preview_begin = true;
+        // else default_preview_flg = true;
+        // lv_clear_cur_ui();
+        // lv_draw_printing();
       #endif
     }
   }
@@ -198,7 +200,7 @@ void filament_pin_setup() {
 
 void filament_check() {
   #if ENABLED(MIXWARE_MODEL_V)
-    if (gCfgItems.filament_det_enable && detector.has_break()) {
+    if (detector.has_break()) {
       lv_clear_cur_ui();
       TERN_(SDSUPPORT, card.pauseSDPrint());
       stop_print_time();

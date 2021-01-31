@@ -70,6 +70,9 @@ void FilamentDetector::reset() {
 }
 
 void FilamentDetector::update() {
+  if (!gCfgItems.filament_det_enable)
+    return;
+
   static uint8_t last_state = 0;
   const uint8_t cur_state = (READ(MT_DET_1_PIN) ? _BV(0) : 0),
                 change = last_state ^ cur_state;
@@ -97,18 +100,18 @@ void FilamentDetector::update() {
 }
 
 void FilamentDetector::alarm() {
-  if (stepper.axis_is_moving(E_AXIS) && last_pos && stepper.position(E_AXIS) ? (bool)(cur_gap >= alarm_gap) : false)
-    WRITE(BEEPER_PIN, HIGH);
-  else
-    WRITE(BEEPER_PIN, LOW);
+  const bool a = (gCfgItems.filament_det_enable && stepper.axis_is_moving(E_AXIS) && last_pos && stepper.position(E_AXIS)) ? (bool)(cur_gap >= alarm_gap) : false;
+
+  if (a) WRITE(BEEPER_PIN, HIGH);
+  else   WRITE(BEEPER_PIN, LOW);
 }
 
 bool FilamentDetector::has_break() {
-  return stepper.axis_is_moving(E_AXIS) && last_pos && stepper.position(E_AXIS) ? (bool)(cur_gap >= stop_gap) : false;
+  return (gCfgItems.filament_det_enable && stepper.axis_is_moving(E_AXIS) && last_pos && stepper.position(E_AXIS)) ? (bool)(cur_gap >= stop_gap) : false;
 }
 
 bool FilamentDetector::has_block() {
-  return (bool)(block_count > FILAMENT_DETECTOR_BLOCK_NUMBER);
+  return (bool)(gCfgItems.filament_det_enable && block_count > FILAMENT_DETECTOR_BLOCK_NUMBER);
 }
 
 #endif // MIXWARE_MODEL_V

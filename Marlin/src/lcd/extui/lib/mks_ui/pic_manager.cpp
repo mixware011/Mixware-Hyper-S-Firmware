@@ -193,6 +193,7 @@ static const char assets[][LONG_FILENAME_LENGTH] = {
   "bmp_blank_sel.bin",
   "bmp_disable.bin",
   "bmp_enable.bin",
+  "img_null.bin"
 #else
   //homing screen
   "bmp_zeroAll.bin",

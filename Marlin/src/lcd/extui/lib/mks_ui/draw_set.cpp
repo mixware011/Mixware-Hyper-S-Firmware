@@ -63,7 +63,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
   if (event != LV_EVENT_RELEASED) return;
   if(obj->mks_obj_id != ID_S_MOTOR_OFF
     #if ENABLED(MIXWARE_MODEL_V)
-      // && obj->mks_obj_id != ID_S_FILAMENT_DET
+      && obj->mks_obj_id != ID_S_FILAMENT_DET
     #endif
   ) lv_clear_set();
   switch (obj->mks_obj_id) {

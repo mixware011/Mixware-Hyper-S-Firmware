@@ -868,6 +868,8 @@ void disp_language_init() {
   machine_setting_disp();
 
   operation_menu.babystep = TEXT_BABY_STEP_EN;
+  TERN_(MIXWARE_MODEL_V, machine_menu.FilamentConfTitle = FILAMENT_DIALOG_BREAK_TITLE_EN);
+  TERN_(MIXWARE_MODEL_V, machine_menu.FilamentDetPausing = FILAMENT_DIALOG_BREAKING_EN);
 
   switch (gCfgItems.language) {
     case LANG_SIMPLE_CHINESE:
@@ -1052,6 +1054,9 @@ void disp_language_init() {
       operation_menu.move       = PRINTING_MOVE_CN;
       operation_menu.auto_off   = AUTO_SHUTDOWN_CN;
       operation_menu.manual_off = MANUAL_SHUTDOWN_CN;
+      operation_menu.babystep   = TEXT_BABY_STEP_CN;
+      TERN_(MIXWARE_MODEL_V, machine_menu.FilamentConfTitle = FILAMENT_DIALOG_BREAK_TITLE_CN);
+      TERN_(MIXWARE_MODEL_V, machine_menu.FilamentDetPausing = FILAMENT_DIALOG_BREAKING_CN);
       //
       pause_menu.title    = TITLE_PAUSE_CN;
       pause_menu.resume   = PRINTING_RESUME_CN;
@@ -1299,6 +1304,9 @@ void disp_language_init() {
             operation_menu.move       = PRINTING_MOVE_T_CN;
             operation_menu.auto_off   = AUTO_SHUTDOWN_T_CN;
             operation_menu.manual_off = MANUAL_SHUTDOWN_T_CN;
+            operation_menu.babystep   = TEXT_BABY_STEP_T_CN;
+            TERN_(MIXWARE_MODEL_V, machine_menu.FilamentConfTitle = FILAMENT_DIALOG_BREAK_TITLE_T_CN);
+            TERN_(MIXWARE_MODEL_V, machine_menu.FilamentDetPausing = FILAMENT_DIALOG_BREAKING_T_CN);
             //
             pause_menu.title    = TITLE_PAUSE_T_CN;
             pause_menu.resume   = PRINTING_RESUME_T_CN;

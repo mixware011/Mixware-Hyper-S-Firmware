@@ -253,7 +253,7 @@ void disp_speed_type() {
     lv_imgbtn_set_src_both(buttonType, editingFlowrate ? "F:/img_extruct.bin" : "F:/img_move.bin");
     lv_obj_refresh_ext_draw_pad(buttonType);
     if (gCfgItems.multiple_language) {
-      lv_label_set_text(labelType, editingFlowrate ? speed_menu.move : speed_menu.extrude);
+      lv_label_set_text(labelType, editingFlowrate ? speed_menu.extrude : speed_menu.move);
       lv_obj_align(labelType, buttonType, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
     }
   #else

@@ -126,6 +126,10 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
     #endif
   }
   else if (DIALOG_IS(TYPE_STOP)) {
+    gcode.process_subcommands_now_P(PSTR("G91"));
+    gcode.process_subcommands_now_P(PSTR("G1 Z5"));
+    gcode.process_subcommands_now_P(PSTR("G90"));
+
     wait_for_heatup = false;
     stop_print_time();
     lv_clear_dialog();
@@ -209,15 +213,18 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
       lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_HEAT);
       thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = PREHEAT_1_TEMP_HOTEND;
       thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
+      gCfgItems.filament_limit_temper = PREHEAT_1_TEMP_HOTEND;
     }
     else if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_SELECT)) {
       lv_clear_cur_ui();
       lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_HEAT);
       thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = PREHEAT_1_TEMP_HOTEND;
       thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
+      gCfgItems.filament_limit_temper = PREHEAT_1_TEMP_HOTEND;
     }
     #if HAS_ABL_NOT_UBL
       else if (DIALOG_IS(AUTO_LEVEL_COMPLETED)) {
+        level_state = LEVEL_STATE_NULL;
         lv_clear_cur_ui();
         lv_draw_dialog(DIALOG_AUTO_LEVELING);
       }
@@ -274,12 +281,14 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
       lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_HEAT);
       thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = PREHEAT_2_TEMP_HOTEND;
       thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
+      gCfgItems.filament_limit_temper = PREHEAT_2_TEMP_HOTEND;
     }
     else if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_SELECT)) {
       lv_clear_cur_ui();
       lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_HEAT);
       thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = PREHEAT_2_TEMP_HOTEND;
       thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
+      gCfgItems.filament_limit_temper = PREHEAT_2_TEMP_HOTEND;
     }
     #if HAS_ABL_NOT_UBL
       else if (DIALOG_IS(AUTO_LEVELING)) {
@@ -455,7 +464,16 @@ void lv_draw_dialog(uint8_t type) {
   }
   else if (DIALOG_IS(TYPE_FINISH_PRINT)) {
     lv_label_set_text(labelDialog, print_file_dialog_menu.print_finish);
-    lv_obj_align(labelDialog, nullptr, LV_ALIGN_CENTER, 0, -20);
+    lv_obj_align(labelDialog, nullptr, LV_ALIGN_CENTER, 0, -70);
+    #if ENABLED(MIXWARE_MODEL_V)
+      lv_obj_t * labelTime = lv_label_create(scr, "");
+      lv_obj_set_style(labelTime, &tft_style_label_rel);
+
+      sprintf_P(public_buf_l, PSTR("%s: %d%d:%d%d:%d%d"), print_file_dialog_menu.print_time, print_time.hours / 10, print_time.hours % 10, print_time.minutes / 10, print_time.minutes % 10, print_time.seconds / 10, print_time.seconds % 10);
+
+      lv_label_set_text(labelTime, public_buf_l);
+      lv_obj_align(labelTime, nullptr, LV_ALIGN_CENTER, 0, -20);
+    #endif
   }
   else if (DIALOG_IS(PAUSE_MESSAGE_PAUSING)) {
     lv_label_set_text(labelDialog, pause_msg_menu.pausing);
@@ -615,7 +633,7 @@ void lv_draw_dialog(uint8_t type) {
   }
   #if ENABLED(MIXWARE_MODEL_V)
     else if (DIALOG_IS(RUNOUT_PAUSING, TYPE_FILAMENT_PAUSING)) {
-      lv_label_set_text(labelDialog, pause_msg_menu.pausing);
+      lv_label_set_text(labelDialog, machine_menu.FilamentDetPausing);
       lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
     }
     else if (DIALOG_IS(TYPE_REPRINT_NO_FILE)) {
@@ -641,18 +659,34 @@ void lv_draw_dialog(uint8_t type) {
     else if (DIALOG_IS(RUNOUT_LOADTIPS)) {
       lv_label_set_text(labelDialog, filament_menu.filament_dialog_load_heat_confirm);
       lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
+
+      lv_obj_t * label_Det_title = lv_label_create(scr, machine_menu.FilamentConfTitle);
+      lv_obj_set_style(label_Det_title, &tft_style_label_rel);
+      lv_obj_align(label_Det_title, nullptr, LV_ALIGN_CENTER, 0, -70);
     }
     else if (DIALOG_IS(RUNOUT_LOAD)) {
       lv_label_set_text(labelDialog, filament_menu.filament_dialog_loading);
-      lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -70);
+      lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
+
+      lv_obj_t * label_Det_title = lv_label_create(scr, machine_menu.FilamentConfTitle);
+      lv_obj_set_style(label_Det_title, &tft_style_label_rel);
+      lv_obj_align(label_Det_title, nullptr, LV_ALIGN_CENTER, 0, -70);
     }
     else if (DIALOG_IS(RUNOUT_UNLOAD)) {
       lv_label_set_text(labelDialog, filament_menu.filament_dialog_unloading);
-      lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -70);
+      lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
+
+      lv_obj_t * label_Det_title = lv_label_create(scr, machine_menu.FilamentConfTitle);
+      lv_obj_set_style(label_Det_title, &tft_style_label_rel);
+      lv_obj_align(label_Det_title, nullptr, LV_ALIGN_CENTER, 0, -70);
     }
     else if (DIALOG_IS(RUNOUT_FINISH)) {
       lv_label_set_text(labelDialog, pause_msg_menu.option);
-      lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -70);
+      lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
+
+      lv_obj_t * label_Det_title = lv_label_create(scr, machine_menu.FilamentConfTitle);
+      lv_obj_set_style(label_Det_title, &tft_style_label_rel);
+      lv_obj_align(label_Det_title, nullptr, LV_ALIGN_CENTER, 0, -70);
     }
     else if (DIALOG_IS(TYPE_FILAMENT_CLOG)) {
       lv_label_set_text(labelDialog, filament_menu.filament_clogging);
@@ -700,7 +734,7 @@ void filament_sprayer_temp() {
 
 void filament_dialog_handle() {
   #if ENABLED(MIXWARE_MODEL_V)
-    if (uiCfg.print_state != IDLE && uiCfg.print_state != PAUSED)
+    if (uiCfg.print_state != IDLE && uiCfg.print_state != PAUSED && uiCfg.print_state != REPRINTING)
       return;
     if(temps_update_flag) {
       temps_update_flag = false;
@@ -749,7 +783,7 @@ void filament_dialog_handle() {
     planner.synchronize();
     uiCfg.filament_unloading_time_flg = 1;
     uiCfg.filament_unloading_time_cnt = 0;
-    sprintf_P(public_buf_m, PSTR("T%d\nG91\nG1 E-%d F%d\nG90"), uiCfg.curSprayerChoose, gCfgItems.filamentchange_unload_length, gCfgItems.filamentchange_unload_speed);
+    sprintf_P(public_buf_m, PSTR("T%d\nG91\nG1 E10 F100\nG1 E-%d F%d\nG90"), uiCfg.curSprayerChoose, gCfgItems.filamentchange_unload_length, gCfgItems.filamentchange_unload_speed);
     queue.inject(public_buf_m);
   }
 
@@ -764,8 +798,8 @@ void filament_dialog_handle() {
     #if ENABLED(MIXWARE_MODEL_V)
       if (uiCfg.print_state == IDLE)
         queue.inject_P(PSTR("G1 X5 Y0 Z50 F2000"));
-      else
-        queue.inject_P(PSTR("G1 X5 Y0 F2000"));
+      // else
+      //   queue.inject_P(PSTR("G1 X5 Y0 F2000"));
     #endif
     lv_clear_dialog();
     lv_draw_dialog(DIALOG_TYPE_FILAMENT_HEAT_LOAD_COMPLETED);
@@ -787,7 +821,7 @@ void filament_dialog_handle() {
     uiCfg.filament_unload_heat_flg = 0;
     #if ENABLED(MIXWARE_MODEL_V)
       if (uiCfg.print_state == IDLE)
-        queue.inject_P(PSTR("G1 X0 Y0 Z50 F2000"));
+        queue.inject_P(PSTR("G1 X5 Y0 Z50 F2000"));
       // else
       //   queue.inject_P(PSTR("G1 X0 Y0 F2000"));
 
@@ -822,16 +856,12 @@ void lv_clear_dialog() {
 
 #if ENABLED(MIXWARE_MODEL_V)
 void auto_leveling_dialog_handle() {
-  if (DIALOG_IS(AUTO_LEVELING)) {
-    if (!level_update_flag && level_state == LEVEL_STATE_NULL) {
-      uiCfg.dialogType = DIALOG_AUTO_LEVEL_HOMING;
-      queue.inject_P(PSTR("G28\nG29"));
-    }
+  if (DIALOG_IS(AUTO_LEVELING) && level_state == LEVEL_STATE_NULL) {
+    uiCfg.dialogType = DIALOG_AUTO_LEVEL_HOMING;
+    queue.inject_P(PSTR("G28\nG29"));
   }
-  else if (DIALOG_IS(AUTO_LEVEL_HOMING)) {
-    if (level_state == LEVEL_STATE_LEVELING) {
-      uiCfg.dialogType = DIALOG_AUTO_LEVEL_LEVELING;
-    }
+  else if (DIALOG_IS(AUTO_LEVEL_HOMING) && level_state == LEVEL_STATE_LEVELING) {
+    uiCfg.dialogType = DIALOG_AUTO_LEVEL_LEVELING;
   }
   else if (DIALOG_IS(AUTO_LEVEL_LEVELING)) {
     if (level_state == LEVEL_STATE_LEVELERR) {
@@ -849,9 +879,7 @@ void auto_leveling_dialog_handle() {
     if (DIALOG_IS(ADJUST_Z_HEIGHT_WAIT_START)) {
       if (uiCfg.leveling_first_time) {
         uiCfg.leveling_first_time = 0;
-        if (!all_axes_trusted())
-          queue.enqueue_now_P(PSTR("G28"));
-
+        if (!all_axes_trusted()) queue.enqueue_now_P(PSTR("G28"));
         queue.enqueue_now_P(PSTR("G1 X150 Y150 F3000"));
         queue.enqueue_now_P(PSTR("G1 Z0 F600"));
       }
@@ -866,8 +894,8 @@ void auto_leveling_dialog_handle() {
 }
 
 void runout_dialog_handle() {
-  if (DIALOG_IS(RUNOUT_UNLOAD) && (abs(thermalManager.temp_hotend[0].target - thermalManager.temp_hotend[0].celsius) <= 3)) {
-    if (uiCfg.filament_heat_completed_unload == 1) {
+  if (DIALOG_IS(RUNOUT_UNLOAD) && (abs(thermalManager.temp_hotend[0].target - thermalManager.temp_hotend[0].celsius) <= 2)) {
+    if (uiCfg.filament_heat_completed_unload) {
       uiCfg.filament_heat_completed_unload = 0;
       planner.synchronize();
       uiCfg.filament_unloading_time_flg = 1;
@@ -876,7 +904,7 @@ void runout_dialog_handle() {
       sprintf_P(public_buf_m, PSTR("T%d\nG91\nG1 E10 F100\nG1 E-%d F%d\nG90"), uiCfg.curSprayerChoose, gCfgItems.filamentchange_unload_length, gCfgItems.filamentchange_unload_speed);
       queue.inject_P(PSTR(public_buf_m));
     }
-    if (uiCfg.filament_unloading_completed == 1) {
+    if (uiCfg.filament_unloading_completed) {
       uiCfg.filament_rate = 0;
       uiCfg.filament_unloading_completed = 0;
       lv_clear_dialog();
@@ -884,8 +912,8 @@ void runout_dialog_handle() {
     }
   }
 
-  if (DIALOG_IS(RUNOUT_LOAD) && (abs(thermalManager.temp_hotend[0].target - thermalManager.temp_hotend[0].celsius) <= 3)) {
-    if (uiCfg.filament_heat_completed_load == 1) {
+  if (DIALOG_IS(RUNOUT_LOAD) && (abs(thermalManager.temp_hotend[0].target - thermalManager.temp_hotend[0].celsius) <= 2)) {
+    if (uiCfg.filament_heat_completed_load) {
       uiCfg.filament_heat_completed_load = 0;
       planner.synchronize();
       uiCfg.filament_loading_time_flg = 1;

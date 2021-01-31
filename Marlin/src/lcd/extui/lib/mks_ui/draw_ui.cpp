@@ -587,7 +587,7 @@ char *getDispText(int index) {
 char *creat_title_text() {
   int index     = 0;
   char *tmpText = 0;
-  char tmpCurFileStr[20];
+  char tmpCurFileStr[30];
 
   ZERO(tmpCurFileStr);
 
@@ -747,6 +747,7 @@ char *creat_title_text() {
           card.startFileprint();
           TERN_(POWER_LOSS_RECOVERY, recovery.prepare());
           once_flag = false;
+          SERIAL_ECHOPAIR("\r\n ???????????????????????????: ");
         }
         return;
       }
@@ -788,8 +789,8 @@ char *creat_title_text() {
     #endif
     #if HAS_GCODE_DEFAULT_VIEW_IN_FLASH
       if (default_preview_flg) {
-        draw_default_preview(xpos_pixel, ypos_pixel, 0);
         default_preview_flg = false;
+        draw_default_preview(xpos_pixel, ypos_pixel, 0);
       }
     #endif
   }

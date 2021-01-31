@@ -761,6 +761,8 @@
   #define FILAMENT_DIALOG_CLOGGING_EN           "The filament is clogging,\nplease clear the nozzle.\nclick <confirm> for return!"
   #define FILAMENT_SENSOR_ON_EN                 "Filament\nDetector: On"
   #define FILAMENT_SENSOR_OFF_EN                "Filament\nDetector: Off"
+  #define FILAMENT_DIALOG_BREAKING_EN           "Filament abnormal, pausing...."
+  #define FILAMENT_DIALOG_BREAK_TITLE_EN        "Filament Detector: Filament abnormal"
   #define AUTO_LEVELING_TITLE_EN                "Auto Leveling"
   #define AUTO_LEVELING_COMPLETED_EN            "Click <confirm> for start auto leveling"
   #define AUTO_LEVELING_LEVELING_EN             "In Auto leveling, please wait!"

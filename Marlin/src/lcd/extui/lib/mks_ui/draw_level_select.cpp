@@ -49,26 +49,26 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
   if (event != LV_EVENT_RELEASED) return;
   switch (obj->mks_obj_id) {
     case ID_LEVEL_SELECT_AUTO:
-        #if HAS_ABL_NOT_UBL
-          lv_clear_level_select();
-          lv_draw_dialog(DIALOG_AUTO_LEVEL_COMPLETED);
-        #endif
+      #if HAS_ABL_NOT_UBL
+        lv_clear_level_select();
+        lv_draw_dialog(DIALOG_AUTO_LEVEL_COMPLETED);
+      #endif
       break;
     case ID_LEVEL_SELECT_MANUAL:
-        uiCfg.leveling_first_time = 1;
-        lv_clear_level_select();
-        lv_draw_manualLevel();
+      uiCfg.leveling_first_time = 1;
+      lv_clear_level_select();
+      lv_draw_manualLevel();
       break;
     case ID_LEVEL_SELECT_HEIGHT:
-        uiCfg.leveling_first_time = 1;
-        uiCfg.move_dist = 0.1;
-        lv_clear_level_select();
-        lv_draw_dialog(DIALOG_ADJUST_Z_HEIGHT_WAIT_START);
+      uiCfg.leveling_first_time = 1;
+      uiCfg.move_dist = 0.1;
+      lv_clear_level_select();
+      lv_draw_dialog(DIALOG_ADJUST_Z_HEIGHT_WAIT_START);
       break;
     case ID_LEVEL_SELECT_RETURN:
-        lv_clear_level_select();
-        disp_state_stack._disp_index = 2;
-        lv_draw_tool();
+      lv_clear_level_select();
+      disp_state_stack._disp_index = 2;
+      lv_draw_tool();
       break;
   }
 }
