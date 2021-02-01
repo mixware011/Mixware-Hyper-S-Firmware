@@ -37,6 +37,7 @@ static lv_obj_t * scr;
 
 static lv_obj_t *buttonStep, *labelStep;
 static lv_obj_t *labelZ_offset;
+static float    z_offset_bak;
 
 enum {
   ID_ADJUST_Z_ADD = 1,
@@ -100,6 +101,9 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
       disp_adjust_dist();
       break;
     case ID_ADJUST_Z_RETURN:
+      if (!offset_save_flag)
+        probe.offset.z = z_offset_bak;
+
       queue.inject_P(PSTR("M84"));
       lv_clear_cur_ui();
       lv_draw_level_select();
@@ -109,6 +113,8 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
 
 void lv_draw_adjust_z_offset(void) {
   scr = lv_screen_create(ADJUST_Z_OFFSET_UI);
+  z_offset_bak = probe.offset.z;
+  offset_save_flag = false;
 
   lv_big_button_create(scr, "F:/img_save.bin", adjust_z_menu.save, button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_ADJUST_Z_SAVE);
 
@@ -129,16 +135,14 @@ void lv_draw_adjust_z_offset(void) {
   lv_img_set_src(buttonZ_offset, "F:/img_zpos_state.bin");
   lv_obj_set_pos(buttonZ_offset, 125, 85);
 
-  labelZ_offset = lv_label_create_empty(scr);
-  lv_obj_set_style(labelZ_offset, &tft_style_label_rel);
-  lv_obj_set_pos(labelZ_offset, 170, 95);
+  labelZ_offset = lv_label_create(scr, 170, 95, nullptr);
 
   disp_adjust_dist();
   disp_z_offset_pos();
 }
 
 void disp_z_offset_pos() {
-  sprintf_P(public_buf_l, PSTR("%.1f"), probe.offset.z);
+  sprintf_P(public_buf_l, PSTR("%.2f"), probe.offset.z);
   lv_label_set_text(labelZ_offset, public_buf_l);
 }
 

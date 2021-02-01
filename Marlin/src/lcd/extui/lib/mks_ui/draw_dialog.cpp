@@ -126,10 +126,6 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
     #endif
   }
   else if (DIALOG_IS(TYPE_STOP)) {
-    gcode.process_subcommands_now_P(PSTR("G91"));
-    gcode.process_subcommands_now_P(PSTR("G1 Z5"));
-    gcode.process_subcommands_now_P(PSTR("G90"));
-
     wait_for_heatup = false;
     stop_print_time();
     lv_clear_dialog();
@@ -156,6 +152,7 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
   #endif
   else if (DIALOG_IS(STORE_EEPROM_TIPS)) {
     TERN_(EEPROM_SETTINGS, (void)settings.save());
+    TERN_(MIXWARE_MODEL_V, offset_save_flag = true);
     lv_clear_cur_ui();
     lv_draw_return_ui();
   }
@@ -268,13 +265,13 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
   }
   #if ENABLED(MIXWARE_MODEL_V)
     else if (DIALOG_IS(RUNOUT_FINISH)) {
+      feedrate_mm_s = (float)uiCfg.moveSpeed_bak;
       planner.set_e_position_mm((destination.e = current_position.e = uiCfg.current_e_position_bak));
-      uiCfg.print_state = RESUMING;
-      lv_clear_cur_ui();
-
       if (gCfgItems.from_flash_pic) flash_preview_begin = true;
       else default_preview_flg = true;
-      lv_draw_return_ui();
+      lv_clear_cur_ui();
+      lv_draw_printing();
+      uiCfg.print_state = RESUMING;
     }
     else if (DIALOG_IS(TYPE_FILAMENT_LOAD_SELECT)) {
       lv_clear_cur_ui();
@@ -397,11 +394,11 @@ void lv_draw_dialog(uint8_t type) {
       lv_label_set_text(labelOk, print_file_dialog_menu.confirm);
     }
     else if (DIALOG_IS(RUNOUT_PAUSING, TYPE_FILAMENT_PAUSING, TYPE_FILAMENT_WAIT_START, ADJUST_Z_HEIGHT_WAIT_START)) {
-
+      //nothing to do
     }
     else if (DIALOG_IS(RUNOUT_UNLOAD, RUNOUT_LOAD)) {
       filament_bar = lv_bar_create(scr, NULL);
-      lv_obj_set_pos(filament_bar, (TFT_WIDTH-300)/2, ((TFT_HEIGHT - titleHeight)-40)/2);
+      lv_obj_set_pos(filament_bar, (TFT_WIDTH-300)/2, ((TFT_HEIGHT-titleHeight))/2+30);
       lv_obj_set_size(filament_bar, 300, 25);
       lv_bar_set_style(filament_bar, LV_BAR_STYLE_INDIC, &lv_bar_style_indic);
       lv_bar_set_anim_time(filament_bar, 1000);
@@ -632,7 +629,11 @@ void lv_draw_dialog(uint8_t type) {
     lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, 0);
   }
   #if ENABLED(MIXWARE_MODEL_V)
-    else if (DIALOG_IS(RUNOUT_PAUSING, TYPE_FILAMENT_PAUSING)) {
+    else if (DIALOG_IS(TYPE_FILAMENT_PAUSING)) {
+      lv_label_set_text(labelDialog, pause_msg_menu.pausing);
+      lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
+    }
+    else if (DIALOG_IS(RUNOUT_PAUSING)) {
       lv_label_set_text(labelDialog, machine_menu.FilamentDetPausing);
       lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
     }

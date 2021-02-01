@@ -88,9 +88,8 @@ void printer_state_polling() {
 
   if (uiCfg.print_state == PAUSED) {
     #if ENABLED(MIXWARE_MODEL_V)
-      planner.synchronize();
+      // planner.synchronize();  //can not add.
       if (uiCfg.dialogType == DIALOG_RUNOUT_PAUSING) {
-        WRITE(BEEPER_PIN, LOW);
         lv_clear_cur_ui();
         lv_draw_dialog(DIALOG_RUNOUT_UNLOAD);
       }
@@ -201,12 +200,15 @@ void filament_pin_setup() {
 void filament_check() {
   #if ENABLED(MIXWARE_MODEL_V)
     if (detector.has_break()) {
-      lv_clear_cur_ui();
-      TERN_(SDSUPPORT, card.pauseSDPrint());
-      stop_print_time();
+      uiCfg.moveSpeed_bak = feedrate_mm_s;
       uiCfg.filament_broken = true;
+
+      card.pauseSDPrint();
+      stop_print_time();
       uiCfg.print_state = PAUSING;
 
+      WRITE(BEEPER_PIN, LOW);
+      lv_clear_cur_ui();
       if (detector.has_block()) {
         lv_draw_dialog(DIALOG_TYPE_FILAMENT_CLOG);
       }
@@ -216,83 +218,83 @@ void filament_check() {
       }
     }
   #else // MKS DET
-  #if (PIN_EXISTS(MT_DET_1) || PIN_EXISTS(MT_DET_2) || PIN_EXISTS(MT_DET_3))
-    const int FIL_DELAY = 20;
-  #endif
-  #if PIN_EXISTS(MT_DET_1)
-    static int fil_det_count_1 = 0;
-    if (!READ(MT_DET_1_PIN) && !MT_DET_PIN_INVERTING)
-      fil_det_count_1++;
-    else if (READ(MT_DET_1_PIN) && MT_DET_PIN_INVERTING)
-      fil_det_count_1++;
-    else if (fil_det_count_1 > 0)
-      fil_det_count_1--;
-
-    if (!READ(MT_DET_1_PIN) && !MT_DET_PIN_INVERTING)
-      fil_det_count_1++;
-    else if (READ(MT_DET_1_PIN) && MT_DET_PIN_INVERTING)
-      fil_det_count_1++;
-    else if (fil_det_count_1 > 0)
-      fil_det_count_1--;
-  #endif
-
-  #if PIN_EXISTS(MT_DET_2)
-    static int fil_det_count_2 = 0;
-    if (!READ(MT_DET_2_PIN) && !MT_DET_PIN_INVERTING)
-      fil_det_count_2++;
-    else if (READ(MT_DET_2_PIN) && MT_DET_PIN_INVERTING)
-      fil_det_count_2++;
-    else if (fil_det_count_2 > 0)
-      fil_det_count_2--;
-
-    if (!READ(MT_DET_2_PIN) && !MT_DET_PIN_INVERTING)
-      fil_det_count_2++;
-    else if (READ(MT_DET_2_PIN) && MT_DET_PIN_INVERTING)
-      fil_det_count_2++;
-    else if (fil_det_count_2 > 0)
-      fil_det_count_2--;
-  #endif
-
-  #if PIN_EXISTS(MT_DET_3)
-    static int fil_det_count_3 = 0;
-    if (!READ(MT_DET_3_PIN) && !MT_DET_PIN_INVERTING)
-      fil_det_count_3++;
-    else if (READ(MT_DET_3_PIN) && MT_DET_PIN_INVERTING)
-      fil_det_count_3++;
-    else if (fil_det_count_3 > 0)
-      fil_det_count_3--;
-
-    if (!READ(MT_DET_3_PIN) && !MT_DET_PIN_INVERTING)
-      fil_det_count_3++;
-    else if (READ(MT_DET_3_PIN) && MT_DET_PIN_INVERTING)
-      fil_det_count_3++;
-    else if (fil_det_count_3 > 0)
-      fil_det_count_3--;
-  #endif
-
-  if (false
+    #if (PIN_EXISTS(MT_DET_1) || PIN_EXISTS(MT_DET_2) || PIN_EXISTS(MT_DET_3))
+      const int FIL_DELAY = 20;
+    #endif
     #if PIN_EXISTS(MT_DET_1)
-      || fil_det_count_1 >= FIL_DELAY
+      static int fil_det_count_1 = 0;
+      if (!READ(MT_DET_1_PIN) && !MT_DET_PIN_INVERTING)
+        fil_det_count_1++;
+      else if (READ(MT_DET_1_PIN) && MT_DET_PIN_INVERTING)
+        fil_det_count_1++;
+      else if (fil_det_count_1 > 0)
+        fil_det_count_1--;
+
+      if (!READ(MT_DET_1_PIN) && !MT_DET_PIN_INVERTING)
+        fil_det_count_1++;
+      else if (READ(MT_DET_1_PIN) && MT_DET_PIN_INVERTING)
+        fil_det_count_1++;
+      else if (fil_det_count_1 > 0)
+        fil_det_count_1--;
     #endif
+
     #if PIN_EXISTS(MT_DET_2)
-      || fil_det_count_2 >= FIL_DELAY
+      static int fil_det_count_2 = 0;
+      if (!READ(MT_DET_2_PIN) && !MT_DET_PIN_INVERTING)
+        fil_det_count_2++;
+      else if (READ(MT_DET_2_PIN) && MT_DET_PIN_INVERTING)
+        fil_det_count_2++;
+      else if (fil_det_count_2 > 0)
+        fil_det_count_2--;
+
+      if (!READ(MT_DET_2_PIN) && !MT_DET_PIN_INVERTING)
+        fil_det_count_2++;
+      else if (READ(MT_DET_2_PIN) && MT_DET_PIN_INVERTING)
+        fil_det_count_2++;
+      else if (fil_det_count_2 > 0)
+        fil_det_count_2--;
     #endif
+
     #if PIN_EXISTS(MT_DET_3)
-      || fil_det_count_3 >= FIL_DELAY
+      static int fil_det_count_3 = 0;
+      if (!READ(MT_DET_3_PIN) && !MT_DET_PIN_INVERTING)
+        fil_det_count_3++;
+      else if (READ(MT_DET_3_PIN) && MT_DET_PIN_INVERTING)
+        fil_det_count_3++;
+      else if (fil_det_count_3 > 0)
+        fil_det_count_3--;
+
+      if (!READ(MT_DET_3_PIN) && !MT_DET_PIN_INVERTING)
+        fil_det_count_3++;
+      else if (READ(MT_DET_3_PIN) && MT_DET_PIN_INVERTING)
+        fil_det_count_3++;
+      else if (fil_det_count_3 > 0)
+        fil_det_count_3--;
     #endif
-  ) {
-    lv_clear_cur_ui();
-    TERN_(SDSUPPORT, card.pauseSDPrint());
-    stop_print_time();
-    uiCfg.print_state = PAUSING;
 
-    if (gCfgItems.from_flash_pic)
-      flash_preview_begin = true;
-    else
-      default_preview_flg = true;
+    if (false
+      #if PIN_EXISTS(MT_DET_1)
+        || fil_det_count_1 >= FIL_DELAY
+      #endif
+      #if PIN_EXISTS(MT_DET_2)
+        || fil_det_count_2 >= FIL_DELAY
+      #endif
+      #if PIN_EXISTS(MT_DET_3)
+        || fil_det_count_3 >= FIL_DELAY
+      #endif
+    ) {
+      lv_clear_cur_ui();
+      TERN_(SDSUPPORT, card.pauseSDPrint());
+      stop_print_time();
+      uiCfg.print_state = PAUSING;
 
-    lv_draw_printing();
-  }
+      if (gCfgItems.from_flash_pic)
+        flash_preview_begin = true;
+      else
+        default_preview_flg = true;
+
+      lv_draw_printing();
+    }
   #endif
 }
 

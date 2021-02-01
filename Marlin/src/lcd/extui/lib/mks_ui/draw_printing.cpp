@@ -302,7 +302,6 @@ void setProBarRate() {
     lv_imgbtn_set_src_both(buttonPause, uiCfg.print_state == WORKING ? "F:/bmp_pause.bin" : "F:/bmp_resume.bin");
     lv_label_set_text(labelPause, uiCfg.print_state == WORKING ? printing_menu.pause : printing_menu.resume);
     lv_obj_align(labelPause, buttonPause, LV_ALIGN_CENTER, 20, 0);
-        SERIAL_ECHOPAIR("\r\n : ", __FUNCTION__);
   }
 
   if (rate <= 0) return;

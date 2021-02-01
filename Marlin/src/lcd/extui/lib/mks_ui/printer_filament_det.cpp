@@ -35,7 +35,7 @@ FilamentDetector detector;
 #include "../../../../sd/cardreader.h"
 
 #ifndef FILAMENT_DETECTOR_ALARM_GAP
-  #define FILAMENT_DETECTOR_ALARM_GAP 8
+  #define FILAMENT_DETECTOR_ALARM_GAP 10
 #endif
 
 #ifndef FILAMENT_DETECTOR_STOP_GAP
@@ -61,12 +61,10 @@ millis_t FilamentDetector::update_time;
 
 void FilamentDetector::reset() {
   uiCfg.filament_broken = false;
-  detector.last_pos = block_count = 0;
+  last_pos = block_count = 0;
   last_time = millis();
   alarm_gap = planner.settings.axis_steps_per_mm[E_AXIS] * FILAMENT_DETECTOR_ALARM_GAP;
   stop_gap = planner.settings.axis_steps_per_mm[E_AXIS] * FILAMENT_DETECTOR_STOP_GAP;
-
-  WRITE(BEEPER_PIN, LOW);
 }
 
 void FilamentDetector::update() {

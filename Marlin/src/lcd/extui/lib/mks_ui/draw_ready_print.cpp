@@ -47,6 +47,9 @@ static lv_obj_t *scr;
 #if ENABLED(MKS_TEST)
   uint8_t curent_disp_ui = 0;
 #endif
+#if ENABLED(MIXWARE_MODEL_V)
+  static lv_obj_t *label_R_Ext, *label_R_Bed;
+#endif
 
 enum {
   ID_TOOL = 1,
@@ -200,6 +203,18 @@ void lv_draw_ready_print(void) {
       lv_big_button_create(scr, "F:/img_tool.bin",     main_menu.tool,  28,  340, event_handler, ID_TOOL);
       lv_big_button_create(scr, "F:/img_set.bin",      main_menu.set,   173, 340, event_handler, ID_SET);
       lv_big_button_create(scr, "F:/img_printing.bin", main_menu.print, 101, 198, event_handler, ID_PRINT);
+
+      lv_obj_t *buttonExt = lv_img_create(scr, nullptr);
+      lv_img_set_src(buttonExt, "F:/bmp_ext2_state.bin");
+      lv_obj_set_pos(buttonExt, 23, 82);
+      label_R_Ext = lv_label_create(scr, 73, 92, nullptr);
+
+      lv_obj_t *buttonBedstate = lv_img_create(scr, nullptr);
+      lv_img_set_src(buttonBedstate, "F:/bmp_bed_state.bin");
+      lv_obj_set_pos(buttonBedstate, 168, 82);
+      label_R_Bed = lv_label_create(scr, 218, 92, nullptr);
+
+      disp_ready_print_temp();
     #else
       lv_big_button_create(scr, "F:/bmp_tool.bin", main_menu.tool, 20, 90, event_handler, ID_TOOL);
       lv_big_button_create(scr, "F:/bmp_set.bin", main_menu.set, 180, 90, event_handler, ID_SET);
@@ -222,5 +237,15 @@ void lv_clear_ready_print() {
   #endif
   lv_obj_del(scr);
 }
+
+#if ENABLED(MIXWARE_MODEL_V)
+void disp_ready_print_temp() {
+  sprintf(public_buf_l, preheat_menu.value_state, (int)thermalManager.temp_hotend[0].celsius,  (int)thermalManager.temp_hotend[0].target);
+  lv_label_set_text(label_R_Ext, public_buf_l);
+
+  sprintf(public_buf_l, preheat_menu.value_state, (int)thermalManager.temp_bed.celsius,  (int)thermalManager.temp_bed.target);
+  lv_label_set_text(label_R_Bed, public_buf_l);
+}
+#endif
 
 #endif // HAS_TFT_LVGL_UI

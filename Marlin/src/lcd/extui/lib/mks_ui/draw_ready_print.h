@@ -35,6 +35,10 @@ extern void disp_tmc_ok();
 extern void disp_tmc_error();
 extern void lv_clear_ready_print();
 
+#if ENABLED(MIXWARE_MODEL_V)
+  extern void disp_ready_print_temp();
+#endif
+
 #ifdef __cplusplus
   } /* C-declarations for C++ */
 #endif

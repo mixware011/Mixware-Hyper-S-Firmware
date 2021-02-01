@@ -914,11 +914,6 @@ G29_TYPE GcodeSuite::G29() {
     DWIN_CompletedLeveling();
   #endif
 
-  #if ENABLED(MIXWARE_MODEL_V)
-    if (level_state != LEVEL_STATE_LEVELERR)
-      level_state = LEVEL_STATE_FINISHED;
-  #endif
-
   report_current_position();
 
   G29_RETURN(isnan(measured_z));

@@ -101,6 +101,7 @@ lv_point_t line_points[8][2] = {
 #if ENABLED(MIXWARE_MODEL_V)
   mixware_level_state level_state;
   bool level_update_flag;
+  bool offset_save_flag;
 
   lv_point_t button_pixel_point[6] = {
     {BUTTON_POS_X, BUTTON_POS_Y + BTN_Y_PIXEL*0}, {BUTTON_POS_X*2 + BTN_X_PIXEL + INTERVAL_V, BUTTON_POS_Y + BTN_Y_PIXEL*0},
@@ -836,6 +837,12 @@ void GUI_RefreshPage() {
       }
       break;
     case PRINT_READY_UI:
+      #if ENABLED(MIXWARE_MODEL_V)
+        if (temps_update_flag) {
+          temps_update_flag = false;
+          disp_ready_print_temp();
+        }
+      #endif
       break;
 
     case PRINT_FILE_UI: break;

@@ -868,8 +868,6 @@ void disp_language_init() {
   machine_setting_disp();
 
   operation_menu.babystep = TEXT_BABY_STEP_EN;
-  TERN_(MIXWARE_MODEL_V, machine_menu.FilamentConfTitle = FILAMENT_DIALOG_BREAK_TITLE_EN);
-  TERN_(MIXWARE_MODEL_V, machine_menu.FilamentDetPausing = FILAMENT_DIALOG_BREAKING_EN);
 
   switch (gCfgItems.language) {
     case LANG_SIMPLE_CHINESE:
@@ -1055,8 +1053,6 @@ void disp_language_init() {
       operation_menu.auto_off   = AUTO_SHUTDOWN_CN;
       operation_menu.manual_off = MANUAL_SHUTDOWN_CN;
       operation_menu.babystep   = TEXT_BABY_STEP_CN;
-      TERN_(MIXWARE_MODEL_V, machine_menu.FilamentConfTitle = FILAMENT_DIALOG_BREAK_TITLE_CN);
-      TERN_(MIXWARE_MODEL_V, machine_menu.FilamentDetPausing = FILAMENT_DIALOG_BREAKING_CN);
       //
       pause_menu.title    = TITLE_PAUSE_CN;
       pause_menu.resume   = PRINTING_RESUME_CN;
@@ -1305,8 +1301,6 @@ void disp_language_init() {
             operation_menu.auto_off   = AUTO_SHUTDOWN_T_CN;
             operation_menu.manual_off = MANUAL_SHUTDOWN_T_CN;
             operation_menu.babystep   = TEXT_BABY_STEP_T_CN;
-            TERN_(MIXWARE_MODEL_V, machine_menu.FilamentConfTitle = FILAMENT_DIALOG_BREAK_TITLE_T_CN);
-            TERN_(MIXWARE_MODEL_V, machine_menu.FilamentDetPausing = FILAMENT_DIALOG_BREAKING_T_CN);
             //
             pause_menu.title    = TITLE_PAUSE_T_CN;
             pause_menu.resume   = PRINTING_RESUME_T_CN;
@@ -2884,13 +2878,17 @@ void disp_language_init() {
   }
 
   #if ENABLED(MIXWARE_MODEL_V)
-    preheat_menu.heatPLA     = PREHAET_PLA;
-    preheat_menu.heatABS     = PREHAET_ABS;
-    move_menu.step_5mm   = TEXT_5MM;
-    move_menu.x_axis = HOME_X_TEXT;
-    move_menu.y_axis = HOME_Y_TEXT;
-    move_menu.z_axis = HOME_Z_TEXT;
-    
+    preheat_menu.heatPLA                            = PREHAET_PLA;
+    preheat_menu.heatABS                            = PREHAET_ABS;
+    move_menu.step_5mm                              = TEXT_5MM;
+    move_menu.x_axis                                = HOME_X_TEXT;
+    move_menu.y_axis                                = HOME_Y_TEXT;
+    move_menu.z_axis                                = HOME_Z_TEXT;
+    operation_menu.filament_sensor_on               = FILAMENT_SENSOR_ON_EN;
+    operation_menu.filament_sensor_off              = FILAMENT_SENSOR_OFF_EN;
+    machine_menu.FilamentConfTitle                  = FILAMENT_DIALOG_BREAK_TITLE_EN;
+    machine_menu.FilamentDetPausing                 = FILAMENT_DIALOG_BREAKING_EN;
+
     switch (gCfgItems.language) {
       case LANG_SIMPLE_CHINESE:
         adjust_z_menu.title                         = OFFSET_Z_CN;
@@ -2911,6 +2909,8 @@ void disp_language_init() {
         leveling_menu.z_offset                      = OFFSET_Z_CN;
         operation_menu.filament_sensor_on           = FILAMENT_SENSOR_ON_CN;
         operation_menu.filament_sensor_off          = FILAMENT_SENSOR_OFF_CN;
+        machine_menu.FilamentConfTitle              = FILAMENT_DIALOG_BREAK_TITLE_CN;
+        machine_menu.FilamentDetPausing             = FILAMENT_DIALOG_BREAKING_CN;
         break;
       case LANG_COMPLEX_CHINESE:
         adjust_z_menu.title                         = OFFSET_Z_T_CN;
@@ -2931,6 +2931,8 @@ void disp_language_init() {
         leveling_menu.z_offset                      = OFFSET_Z_T_CN;
         operation_menu.filament_sensor_on           = FILAMENT_SENSOR_ON_T_CN;
         operation_menu.filament_sensor_off          = FILAMENT_SENSOR_OFF_T_CN;
+        machine_menu.FilamentConfTitle              = FILAMENT_DIALOG_BREAK_TITLE_T_CN;
+        machine_menu.FilamentDetPausing             = FILAMENT_DIALOG_BREAKING_T_CN;
         break;
       case LANG_ENGLISH:
         adjust_z_menu.title                         = OFFSET_Z_EN;
@@ -2949,8 +2951,6 @@ void disp_language_init() {
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_EN;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_EN;
         leveling_menu.z_offset                      = OFFSET_Z_EN;
-        operation_menu.filament_sensor_on           = FILAMENT_SENSOR_ON_EN;
-        operation_menu.filament_sensor_off          = FILAMENT_SENSOR_OFF_EN;
         break;
       case LANG_RUSSIAN:
         adjust_z_menu.title                         = OFFSET_Z_RU;
@@ -2969,8 +2969,6 @@ void disp_language_init() {
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_RU;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_RU;
         leveling_menu.z_offset                      = OFFSET_Z_RU;
-        operation_menu.filament_sensor_on           = FILAMENT_SENSOR_ON_RU;
-        operation_menu.filament_sensor_off          = FILAMENT_SENSOR_OFF_RU;
         break;
       case LANG_SPANISH:
         adjust_z_menu.title                         = OFFSET_Z_SP;
@@ -2989,8 +2987,6 @@ void disp_language_init() {
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_SP;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_SP;
         leveling_menu.z_offset                      = OFFSET_Z_SP;
-        operation_menu.filament_sensor_on           = FILAMENT_SENSOR_ON_SP;
-        operation_menu.filament_sensor_off          = FILAMENT_SENSOR_OFF_SP;
         break;
       case LANG_FRENCH:
         adjust_z_menu.title                         = OFFSET_Z_FR;
@@ -3009,8 +3005,6 @@ void disp_language_init() {
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_FR;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_FR;
         leveling_menu.z_offset                      = OFFSET_Z_FR;
-        operation_menu.filament_sensor_on           = FILAMENT_SENSOR_ON_FR;
-        operation_menu.filament_sensor_off          = FILAMENT_SENSOR_OFF_FR;
         break;
       case LANG_ITALY:
         adjust_z_menu.title                         = OFFSET_Z_IT;
@@ -3029,8 +3023,6 @@ void disp_language_init() {
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_IT;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_IT;
         leveling_menu.z_offset                      = OFFSET_Z_IT;
-        operation_menu.filament_sensor_on           = FILAMENT_SENSOR_ON_IT;
-        operation_menu.filament_sensor_off          = FILAMENT_SENSOR_OFF_IT;
         break;
       default:
         adjust_z_menu.title                         = OFFSET_Z_EN;
@@ -3049,8 +3041,6 @@ void disp_language_init() {
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_EN;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_EN;
         leveling_menu.z_offset                      = OFFSET_Z_EN;
-        operation_menu.filament_sensor_on           = FILAMENT_SENSOR_ON_EN;
-        operation_menu.filament_sensor_off          = FILAMENT_SENSOR_OFF_EN;
         break;
     }
   #endif

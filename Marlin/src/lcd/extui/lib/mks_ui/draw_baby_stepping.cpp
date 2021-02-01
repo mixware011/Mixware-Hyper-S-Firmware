@@ -45,7 +45,6 @@ static lv_obj_t *labelV, *buttonV, *zOffsetText;
 
 #if ENABLED(MIXWARE_MODEL_V)
   static lv_obj_t *labelAxis, *buttonAxis;
-  static lv_obj_t *labelPosX, *labelPosY, *labelPosZ;
 #endif
 
 enum {
@@ -152,7 +151,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
 
 void lv_draw_baby_stepping(void) {
   scr = lv_screen_create(BABY_STEP_UI);
-  
+
   #if ENABLED(MIXWARE_MODEL_V)
     buttonAxis = lv_imgbtn_create(scr, nullptr, button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_BABY_STEP_AXIS);
     buttonV    = lv_imgbtn_create(scr, nullptr, button_pixel_point[3].x, button_pixel_point[3].y, event_handler, ID_BABY_STEP_DIST);
@@ -161,28 +160,19 @@ void lv_draw_baby_stepping(void) {
       if (gCfgItems.encoder_enable) lv_group_add_obj(g, buttonV);
     #endif
 
-    lv_big_button_create(scr, "F:/img_add.bin", preheat_menu.add,  button_pixel_point[4].x, button_pixel_point[4].y, event_handler, ID_BABY_STEP_ADD);
-    lv_big_button_create(scr, "F:/img_dec.bin", preheat_menu.dec,  button_pixel_point[5].x, button_pixel_point[5].y, event_handler, ID_BABY_STEP_DEC);
+    lv_big_button_create(scr, "F:/img_add.bin", adjust_z_menu.add,  button_pixel_point[4].x, button_pixel_point[4].y, event_handler, ID_BABY_STEP_ADD);
+    lv_big_button_create(scr, "F:/img_dec.bin", adjust_z_menu.dec,  button_pixel_point[5].x, button_pixel_point[5].y, event_handler, ID_BABY_STEP_DEC);
 
     labelAxis = lv_label_create_empty(buttonAxis);
     labelV = lv_label_create_empty(buttonV);
 
     lv_screen_menu_item_return(scr, event_handler, ID_BABY_STEP_RETURN);
 
-    lv_obj_t *buttonPosX = lv_img_create(scr, nullptr);
-    lv_img_set_src(buttonPosX, "F:/img_xpos_state.bin");
-    lv_obj_set_pos(buttonPosX, 45, 60);
-    labelPosX = lv_label_create(scr, 90, 70, nullptr);
-
-    lv_obj_t *buttonPosY = lv_img_create(scr, nullptr);
-    lv_img_set_src(buttonPosY, "F:/img_ypos_state.bin");
-    lv_obj_set_pos(buttonPosY, 190, 60);
-    labelPosY = lv_label_create(scr, 235, 70, nullptr);
-
     lv_obj_t *buttonPosZ = lv_img_create(scr, nullptr);
     lv_img_set_src(buttonPosZ, "F:/img_zpos_state.bin");
-    lv_obj_set_pos(buttonPosZ, 45, 110);
-    labelPosZ = lv_label_create(scr, 90, 120, nullptr);
+    lv_obj_set_pos(buttonPosZ, 125, 85);
+
+    zOffsetText = lv_label_create(scr, 170, 95, nullptr);
 
     disp_baby_step_axis();
     disp_baby_step_dist();
@@ -237,17 +227,8 @@ void disp_baby_step_dist() {
 
 void disp_z_offset_value() {
   #if ENABLED(MIXWARE_MODEL_V)
-        ZERO(public_buf_l);
-    sprintf_P(public_buf_l, PSTR("%.1f"), current_position.x);
-    if (labelPosX)lv_label_set_text(labelPosX, public_buf_l);
-
-        ZERO(public_buf_l);
-    sprintf_P(public_buf_l, PSTR("%.1f"), current_position.y);
-    if (labelPosY)lv_label_set_text(labelPosY, public_buf_l);
-
-        ZERO(public_buf_l);
-    sprintf_P(public_buf_l, PSTR("%.1f"), current_position.z);
-    if (labelPosZ)lv_label_set_text(labelPosZ, public_buf_l);
+    sprintf_P(public_buf_l, PSTR("%.2f"), probe.offset.z);
+    if (zOffsetText)lv_label_set_text(zOffsetText, public_buf_l);
   #else
     char buf[20];
     #if HAS_BED_PROBE
