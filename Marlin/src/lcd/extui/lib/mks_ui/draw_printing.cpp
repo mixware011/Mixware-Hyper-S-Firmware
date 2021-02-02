@@ -209,7 +209,7 @@ void lv_draw_printing(void) {
 
     #if ENABLED(MIXWARE_MODEL_V)
       lv_label_set_text(labelDet, gCfgItems.filament_det_enable ? operation_menu.filament_sensor_on : operation_menu.filament_sensor_off);
-      lv_obj_align(labelDet, buttonDet, LV_ALIGN_CENTER, 20, 0);
+      lv_obj_align(labelDet, buttonDet, LV_ALIGN_CENTER, 18, 0);
     #endif
   }
 

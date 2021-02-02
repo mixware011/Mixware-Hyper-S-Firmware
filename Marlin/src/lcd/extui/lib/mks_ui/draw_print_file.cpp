@@ -269,7 +269,7 @@ void disp_gcode_icon(uint8_t file_num) {
     else {
       if (dir_offset[curDirLever].curPage > 0)
         lv_screen_menu_item_turn_page(scr, machine_menu.previous, event_handler, ID_P_UP);
-      else if (dir_offset[curDirLever].cur_page_last_offset > 0)
+      else if (dir_offset[curDirLever].cur_page_last_offset > 0 && card.get_num_Files() > FILE_NUM)
         lv_screen_menu_item_turn_page(scr, machine_menu.next, event_handler, ID_P_DOWN);
     }
 
