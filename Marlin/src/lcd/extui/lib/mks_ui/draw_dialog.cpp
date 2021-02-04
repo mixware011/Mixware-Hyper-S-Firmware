@@ -126,6 +126,7 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
     #endif
   }
   else if (DIALOG_IS(TYPE_STOP)) {
+    WRITE(BEEPER_PIN, LOW);
     wait_for_heatup = false;
     stop_print_time();
     lv_clear_dialog();

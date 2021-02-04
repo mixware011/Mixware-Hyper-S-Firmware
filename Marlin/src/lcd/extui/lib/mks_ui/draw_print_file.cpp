@@ -254,7 +254,7 @@ void disp_gcode_icon(uint8_t file_num) {
 
   // Create image buttons
   #if ENABLED(MIXWARE_MODEL_V)
-    if (dir_offset[curDirLever].curPage > 0 && dir_offset[curDirLever].cur_page_last_offset > 0) {
+    if (dir_offset[curDirLever].curPage > 0 && dir_offset[curDirLever].cur_page_last_offset > 0 && card.get_num_Files() > (dir_offset[curDirLever].curPage+1) * FILE_NUM) {
       lv_obj_t* buttonUp = lv_btn_create(scr, PARA_UI_TURN_PAGE_POS_X - PARA_UI_BACK_BTN_X_SIZE - 5, PARA_UI_TURN_PAGE_POS_Y,
                                         PARA_UI_TURN_BTN_X_SIZE, PARA_UI_TURN_BTN_Y_SIZE, event_handler, ID_P_UP);
       lv_obj_t* labelUp = lv_label_create_empty(buttonUp);

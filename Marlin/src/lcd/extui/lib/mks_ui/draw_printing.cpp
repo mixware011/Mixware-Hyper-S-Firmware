@@ -113,6 +113,8 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       lv_draw_dialog(DIALOG_TYPE_STOP);
       break;
     case ID_OPTION:
+      if (uiCfg.print_state == REPRINTING || uiCfg.print_state == REPRINTED)
+        break;
       lv_clear_printing();
       lv_draw_operation();
       break;
@@ -164,16 +166,9 @@ void lv_draw_printing(void) {
 
   buttonPause  = lv_imgbtn_create(scr, uiCfg.print_state == WORKING ? "F:/bmp_pause.bin" : "F:/bmp_resume.bin", TERN(MIXWARE_MODEL_V, 5, 5), TERN(MIXWARE_MODEL_V, 320, 240), event_handler, ID_PAUSE);
   buttonStop   = lv_imgbtn_create(scr, "F:/bmp_stop.bin", TERN(MIXWARE_MODEL_V, 5, 165), TERN(MIXWARE_MODEL_V, 400, 240), event_handler, ID_STOP);
+  buttonOperat = lv_imgbtn_create(scr, "F:/bmp_operate.bin", TERN(MIXWARE_MODEL_V, 165, 325), TERN(MIXWARE_MODEL_V, 400, 240), event_handler, ID_OPTION);
   #if ENABLED(MIXWARE_MODEL_V)
-      if (uiCfg.print_state == REPRINTING && uiCfg.print_state == REPRINTED) {
-        buttonDet  = lv_imgbtn_create(scr, "F:/img_run_out.bin", 165, 400, event_handler, ID_FILAMENT_DET);
-      }
-      else {
-        buttonOperat = lv_imgbtn_create(scr, "F:/bmp_operate.bin", 165, 400, event_handler, ID_OPTION);
-        buttonDet  = lv_imgbtn_create(scr, "F:/img_run_out.bin", 165, 320, event_handler, ID_FILAMENT_DET);
-      }
-  #else
-    buttonOperat = lv_imgbtn_create(scr, "F:/bmp_operate.bin", 325, 240, event_handler, ID_OPTION);
+    buttonDet  = lv_imgbtn_create(scr, "F:/img_run_out.bin", 165, 320, event_handler, ID_FILAMENT_DET);
   #endif
 
   #if HAS_ROTARY_ENCODER
@@ -306,8 +301,8 @@ void setProBarRate() {
   static uint8_t last_print_state = IDLE;
   if (last_print_state != uiCfg.print_state) {
     last_print_state = uiCfg.print_state;
-    lv_imgbtn_set_src_both(buttonPause, uiCfg.print_state == WORKING ? "F:/bmp_pause.bin" : "F:/bmp_resume.bin");
-    lv_label_set_text(labelPause, uiCfg.print_state == WORKING ? printing_menu.pause : printing_menu.resume);
+    lv_imgbtn_set_src_both(buttonPause, (uiCfg.print_state == WORKING || uiCfg.print_state == REPRINTED) ? "F:/bmp_pause.bin" : "F:/bmp_resume.bin");
+    lv_label_set_text(labelPause, (uiCfg.print_state == WORKING || uiCfg.print_state == REPRINTED) ? printing_menu.pause : printing_menu.resume);
     lv_obj_align(labelPause, buttonPause, LV_ALIGN_CENTER, 20, 0);
   }
 
