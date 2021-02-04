@@ -211,13 +211,51 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
       thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = PREHEAT_1_TEMP_HOTEND;
       thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
       gCfgItems.filament_limit_temper = PREHEAT_1_TEMP_HOTEND;
+
+      if (uiCfg.print_state == IDLE) {
+        uiCfg.leveling_first_time = 1;
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+      }
+      else if (uiCfg.print_state == WORKING) {
+        #if ENABLED(SDSUPPORT)
+          card.pauseSDPrint();
+          stop_print_time();
+          uiCfg.print_state = PAUSING;
+        #endif
+
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
+      }
+      else {
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_HEAT);
+      }
     }
     else if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_SELECT)) {
-      lv_clear_cur_ui();
-      lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_HEAT);
       thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = PREHEAT_1_TEMP_HOTEND;
       thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
       gCfgItems.filament_limit_temper = PREHEAT_1_TEMP_HOTEND;
+
+      if (uiCfg.print_state == IDLE) {
+        uiCfg.leveling_first_time = 1;
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+      }
+      else if (uiCfg.print_state == WORKING) {
+        #if ENABLED(SDSUPPORT)
+          card.pauseSDPrint();
+          stop_print_time();
+          uiCfg.print_state = PAUSING;
+        #endif
+
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
+      }
+      else {
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_HEAT);
+      }
     }
     #if HAS_ABL_NOT_UBL
       else if (DIALOG_IS(AUTO_LEVEL_COMPLETED)) {
@@ -279,6 +317,26 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
       thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = PREHEAT_2_TEMP_HOTEND;
       thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
       gCfgItems.filament_limit_temper = PREHEAT_2_TEMP_HOTEND;
+
+      if (uiCfg.print_state == IDLE) {
+        uiCfg.leveling_first_time = 1;
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+      }
+      else if (uiCfg.print_state == WORKING) {
+        #if ENABLED(SDSUPPORT)
+          card.pauseSDPrint();
+          stop_print_time();
+          uiCfg.print_state = PAUSING;
+        #endif
+
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
+      }
+      else {
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_HEAT);
+      }
     }
     else if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_SELECT)) {
       lv_clear_cur_ui();
@@ -286,6 +344,26 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
       thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = PREHEAT_2_TEMP_HOTEND;
       thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
       gCfgItems.filament_limit_temper = PREHEAT_2_TEMP_HOTEND;
+
+      if (uiCfg.print_state == IDLE) {
+        uiCfg.leveling_first_time = 1;
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+      }
+      else if (uiCfg.print_state == WORKING) {
+        #if ENABLED(SDSUPPORT)
+          card.pauseSDPrint();
+          stop_print_time();
+          uiCfg.print_state = PAUSING;
+        #endif
+
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
+      }
+      else {
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_HEAT);
+      }
     }
     #if HAS_ABL_NOT_UBL
       else if (DIALOG_IS(AUTO_LEVELING)) {
@@ -752,10 +830,12 @@ void filament_dialog_handle() {
           if (all_axes_trusted()) {
             lv_clear_dialog();
             if (uiCfg.filament_load_heat_flg) {
-              lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_SELECT);
+              lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_HEAT);
+              // lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_SELECT);
             }
             else if (uiCfg.filament_unload_heat_flg) {
-              lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_SELECT);
+              lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_HEAT);
+              // lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_SELECT);
             }
           }
         }

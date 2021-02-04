@@ -96,10 +96,12 @@ void printer_state_polling() {
       else if (uiCfg.dialogType == DIALOG_TYPE_FILAMENT_PAUSING) {
         lv_clear_dialog();
         if (uiCfg.filament_load_heat_flg) {
-          lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_SELECT);
+      lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_HEAT);
+          // lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_SELECT);
         }
         else if (uiCfg.filament_unload_heat_flg) {
-          lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_SELECT);
+      lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_HEAT);
+          // lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_SELECT);
         }
       }
     #endif

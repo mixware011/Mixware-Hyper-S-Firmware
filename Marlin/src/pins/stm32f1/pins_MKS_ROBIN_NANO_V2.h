@@ -33,7 +33,7 @@
   #error "MKS Robin nano v2 doesn't support FSMC-based TFT displays."
 #endif
 
-#define BOARD_INFO_NAME "MKS Robin nano V2.0"
+#define BOARD_INFO_NAME "HS V1.0"
 
 #define BOARD_NO_NATIVE_USB
 

@@ -206,13 +206,13 @@ void lv_draw_ready_print(void) {
 
       lv_obj_t *buttonExt = lv_img_create(scr, nullptr);
       lv_img_set_src(buttonExt, "F:/bmp_ext2_state.bin");
-      lv_obj_set_pos(buttonExt, 23, 82);
-      label_R_Ext = lv_label_create(scr, 73, 92, nullptr);
+      lv_obj_set_pos(buttonExt, 45, 82);
+      label_R_Ext = lv_label_create(scr, 90, 92, nullptr);
 
       lv_obj_t *buttonBedstate = lv_img_create(scr, nullptr);
       lv_img_set_src(buttonBedstate, "F:/bmp_bed_state.bin");
-      lv_obj_set_pos(buttonBedstate, 168, 82);
-      label_R_Bed = lv_label_create(scr, 218, 92, nullptr);
+      lv_obj_set_pos(buttonBedstate, 190, 82);
+      label_R_Bed = lv_label_create(scr, 235, 92, nullptr);
 
       disp_ready_print_temp();
     #else

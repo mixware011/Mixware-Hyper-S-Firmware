@@ -164,9 +164,16 @@ void lv_draw_printing(void) {
 
   buttonPause  = lv_imgbtn_create(scr, uiCfg.print_state == WORKING ? "F:/bmp_pause.bin" : "F:/bmp_resume.bin", TERN(MIXWARE_MODEL_V, 5, 5), TERN(MIXWARE_MODEL_V, 320, 240), event_handler, ID_PAUSE);
   buttonStop   = lv_imgbtn_create(scr, "F:/bmp_stop.bin", TERN(MIXWARE_MODEL_V, 5, 165), TERN(MIXWARE_MODEL_V, 400, 240), event_handler, ID_STOP);
-  buttonOperat = lv_imgbtn_create(scr, "F:/bmp_operate.bin", TERN(MIXWARE_MODEL_V, 165, 325), TERN(MIXWARE_MODEL_V, 400, 240), event_handler, ID_OPTION);
   #if ENABLED(MIXWARE_MODEL_V)
-    buttonDet  = lv_imgbtn_create(scr, "F:/img_run_out.bin", 165, 320, event_handler, ID_FILAMENT_DET);
+      if (uiCfg.print_state == REPRINTING && uiCfg.print_state == REPRINTED) {
+        buttonDet  = lv_imgbtn_create(scr, "F:/img_run_out.bin", 165, 400, event_handler, ID_FILAMENT_DET);
+      }
+      else {
+        buttonOperat = lv_imgbtn_create(scr, "F:/bmp_operate.bin", 165, 400, event_handler, ID_OPTION);
+        buttonDet  = lv_imgbtn_create(scr, "F:/img_run_out.bin", 165, 320, event_handler, ID_FILAMENT_DET);
+      }
+  #else
+    buttonOperat = lv_imgbtn_create(scr, "F:/bmp_operate.bin", 325, 240, event_handler, ID_OPTION);
   #endif
 
   #if HAS_ROTARY_ENCODER

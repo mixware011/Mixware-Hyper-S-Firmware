@@ -63,22 +63,23 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
     case ID_FILAMNT_IN:
       uiCfg.filament_load_heat_flg = 1;
       #if ENABLED(MIXWARE_MODEL_V)
-        if (uiCfg.print_state == IDLE) {
-          uiCfg.leveling_first_time = 1;
-          lv_clear_filament_change();
-          lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
-        }
-        else if (uiCfg.print_state == WORKING) {
-          #if ENABLED(SDSUPPORT)
-            card.pauseSDPrint();
-            stop_print_time();
-            uiCfg.print_state = PAUSING;
-          #endif
+        // if (uiCfg.print_state == IDLE) {
+        //   uiCfg.leveling_first_time = 1;
+        //   lv_clear_filament_change();
+        //   lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+        // }
+        // else if (uiCfg.print_state == WORKING) {
+        //   #if ENABLED(SDSUPPORT)
+        //     card.pauseSDPrint();
+        //     stop_print_time();
+        //     uiCfg.print_state = PAUSING;
+        //   #endif
 
-          lv_clear_filament_change();
-          lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
-        }
-        else {
+        //   lv_clear_filament_change();
+        //   lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
+        // }
+        // else
+        {
           lv_clear_filament_change();
           lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_SELECT);
         }
@@ -117,22 +118,23 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
     case ID_FILAMNT_OUT:
       uiCfg.filament_unload_heat_flg=1;
       #if ENABLED(MIXWARE_MODEL_V)
-        if (uiCfg.print_state == IDLE) {
-          uiCfg.leveling_first_time = 1;
-          lv_clear_filament_change();
-          lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
-        }
-        else if (uiCfg.print_state == WORKING) {
-          #if ENABLED(SDSUPPORT)
-            card.pauseSDPrint();
-            stop_print_time();
-            uiCfg.print_state = PAUSING;
-          #endif
+        // if (uiCfg.print_state == IDLE) {
+        //   uiCfg.leveling_first_time = 1;
+        //   lv_clear_filament_change();
+        //   lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+        // }
+        // else if (uiCfg.print_state == WORKING) {
+        //   #if ENABLED(SDSUPPORT)
+        //     card.pauseSDPrint();
+        //     stop_print_time();
+        //     uiCfg.print_state = PAUSING;
+        //   #endif
 
-          lv_clear_filament_change();
-          lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
-        }
-        else {
+        //   lv_clear_filament_change();
+        //   lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
+        // }
+        // else
+        {
           lv_clear_filament_change();
           lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_SELECT);
         }
