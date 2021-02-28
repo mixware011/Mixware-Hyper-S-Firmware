@@ -43,6 +43,9 @@
 #define I2C_EEPROM
 #define MARLIN_EEPROM_SIZE                0x1000  // 4KB
 
+#define I2C_SCL_PIN                       PB6 
+#define I2C_SDA_PIN                       PB7
+
 //
 // Release PB4 (Z_DIR_PIN) from JTAG NRST role
 //
@@ -175,27 +178,36 @@
 //
 // Misc. Functions
 //
-#define MT_DET_1                            PA4
-#define MT_DET_2                            PE6
+#define MT_DET_1_PIN                        PA4
+#define MT_DET_2_PIN                        PE6
+#define MT_DET_PIN_INVERTING                false // LVGL UI filament RUNOUT PIN STATE
 #define PW_DET                              PA13
 #define PW_OFF                              PB2
 
 #ifndef FIL_RUNOUT_PIN
-  #define FIL_RUNOUT_PIN                MT_DET_1
+  #define FIL_RUNOUT_PIN                MT_DET_1_PIN
 #endif
 #ifndef FIL_RUNOUT2_PIN
-  #define FIL_RUNOUT2_PIN               MT_DET_2
+  #define FIL_RUNOUT2_PIN               MT_DET_2_PIN
 #endif
 
-#define POWER_LOSS_PIN                    PW_DET
-#define PS_ON_PIN                         PW_OFF
+//#define MKSPWC
+#ifdef MKSPWC
+  #define SUICIDE_PIN                       PW_OFF   // Enable MKSPWC SUICIDE PIN
+  #define SUICIDE_PIN_INVERTING             false // Enable MKSPWC PIN STATE
+  #define KILL_PIN                          PW_DET   // Enable MKSPWC DET PIN
+  #define KILL_PIN_STATE                    true  // Enable MKSPWC PIN STATE
+#endif
 
-//
-// Enable MKSPWC support
-//
-//#define SUICIDE_PIN                       PB2
-//#define KILL_PIN                          PA2
-//#define KILL_PIN_INVERTING                true
+//#define MKS_TEST
+
+#if ENABLED(MKS_TEST)
+  #define MKS_TEST_POWER_LOSS_PIN         PW_DET   // PW_DET
+  #define MKS_TEST_PS_ON_PIN              PW_OFF   // PW_OFF
+#endif
+
+//#define POWER_LOSS_PIN                    PW_DET
+//#define PS_ON_PIN                         PW_OFF
 
 //#define LED_PIN                           PB2
 
@@ -204,6 +216,10 @@
 #define WIFI_SERIAL              3  // USART3
 #define MKS_WIFI_MODULE_SERIAL   1  // USART1
 #define MKS_WIFI_MODULE_SPI      2  // SPI2
+
+#define WIFI_IO0_PIN                      PC13  // MKS ESP WIFI IO0 PIN
+#define WIFI_IO1_PIN                      PC7   // MKS ESP WIFI IO1 PIN
+#define WIFI_RESET_PIN                    PE9   // MKS ESP WIFI RESET PIN
 
 #ifndef SDCARD_CONNECTION
   #define SDCARD_CONNECTION              ONBOARD

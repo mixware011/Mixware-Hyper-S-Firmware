@@ -253,7 +253,7 @@ const char str_t_thermal_runaway[] PROGMEM = STR_T_THERMAL_RUNAWAY,
      */
     void Temperature::report_fan_speed(const uint8_t target) {
       if (target >= FAN_COUNT) return;
-      PORT_REDIRECT(SERIAL_BOTH);
+      PORT_REDIRECT(SERIAL_ALL);
       SERIAL_ECHOLNPAIR("M106 P", target, " S", fan_speed[target]);
     }
   #endif
@@ -1212,7 +1212,7 @@ void Temperature::manage_heater() {
               else if (temp_bed.celsius <= temp_bed.target - (BED_HYSTERESIS))
                 temp_bed.soft_pwm_amount = MAX_BED_POWER >> 1;
             #else // !PIDTEMPBED && !BED_LIMIT_SWITCHING
-              temp_bed.soft_pwm_amount = temp_bed.celsius < temp_bed.target ? MAX_BED_POWER >> 1 : 0;
+              temp_bed.soft_pwm_amount = temp_bed.celsius < temp_bed.target ? (temp_bed.celsius < 70 ? MAX_BED_POWER : temp_bed.celsius < 80 ? 220 : temp_bed.celsius < 90 ? 235 : 255) >> 1 : 0;
             #endif
           }
           else {
@@ -1276,7 +1276,7 @@ void Temperature::manage_heater() {
             // temperature didn't drop at least MIN_COOLING_SLOPE_DEG_CHAMBER_VENT
             if (next_cool_check_ms_2 == 0 || ELAPSED(ms, next_cool_check_ms_2)) {
               if (old_temp - temp_chamber.celsius < float(MIN_COOLING_SLOPE_DEG_CHAMBER_VENT)) flag_chamber_excess_heat = true; //the bed is heating the chamber too much
-              next_cool_check_ms_2 = ms + 1000UL * MIN_COOLING_SLOPE_TIME_CHAMBER_VENT;
+              next_cool_check_ms_2 = ms + SEC_TO_MS(MIN_COOLING_SLOPE_TIME_CHAMBER_VENT);
               old_temp = temp_chamber.celsius;
             }
           }
@@ -2062,7 +2062,7 @@ void Temperature::init() {
       switch (heater_id) {
         case H_BED:     SERIAL_ECHOPGM("bed"); break;
         case H_CHAMBER: SERIAL_ECHOPGM("chamber"); break;
-        default:        SERIAL_ECHO(heater_id);
+        default:        SERIAL_ECHO((int)heater_id);
       }
       SERIAL_ECHOLNPAIR(
         " ; sizeof(running_temp):", sizeof(running_temp),
@@ -2236,17 +2236,17 @@ void Temperature::disable_all_heaters() {
       static uint32_t max6675_temp = 2000;
       #define MAX6675_ERROR_MASK    7
       #define MAX6675_DISCARD_BITS 18
-      #define MAX6675_SPEED_BITS    3       // (_BV(SPR1)) // clock ÷ 64
+      #define MAX6675_SPEED_BITS    3       // (_BV(SPR1)) // clock C7 64
     #elif HAS_MAX31865
       static uint16_t max6675_temp = 2000;  // From datasheet 16 bits D15-D0
       #define MAX6675_ERROR_MASK    1       // D0 Bit not used
       #define MAX6675_DISCARD_BITS  1       // Data is in D15-D1
-      #define MAX6675_SPEED_BITS    3       //  (_BV(SPR1)) // clock ÷ 64
+      #define MAX6675_SPEED_BITS    3       //  (_BV(SPR1)) // clock C7 64
     #else
       static uint16_t max6675_temp = 2000;
       #define MAX6675_ERROR_MASK    4
       #define MAX6675_DISCARD_BITS  3
-      #define MAX6675_SPEED_BITS    2       // (_BV(SPR0)) // clock ÷ 16
+      #define MAX6675_SPEED_BITS    2       // (_BV(SPR0)) // clock C7 16
     #endif
 
     #if HAS_MULTI_6675
@@ -3124,20 +3124,12 @@ void Temperature::tick() {
   }
 
   #if ENABLED(AUTO_REPORT_TEMPERATURES)
-
-    uint8_t Temperature::auto_report_temp_interval;
-    millis_t Temperature::next_temp_report_ms;
-
-    void Temperature::auto_report_temperatures() {
-      if (auto_report_temp_interval && ELAPSED(millis(), next_temp_report_ms)) {
-        next_temp_report_ms = millis() + 1000UL * auto_report_temp_interval;
-        PORT_REDIRECT(SERIAL_BOTH);
-        print_heater_states(active_extruder);
-        SERIAL_EOL();
-      }
+    AutoReporter<Temperature::AutoReportTemp> Temperature::auto_reporter;
+    void Temperature::AutoReportTemp::report() {
+      print_heater_states(active_extruder);
+      SERIAL_EOL();
     }
-
-  #endif // AUTO_REPORT_TEMPERATURES
+  #endif
 
   #if HAS_HOTEND && HAS_DISPLAY
     void Temperature::set_heating_message(const uint8_t e) {
@@ -3253,7 +3245,7 @@ void Temperature::tick() {
           // if the temperature did not drop at least MIN_COOLING_SLOPE_DEG
           if (!next_cool_check_ms || ELAPSED(now, next_cool_check_ms)) {
             if (old_temp - temp < float(MIN_COOLING_SLOPE_DEG)) break;
-            next_cool_check_ms = now + 1000UL * MIN_COOLING_SLOPE_TIME;
+            next_cool_check_ms = now + SEC_TO_MS(MIN_COOLING_SLOPE_TIME);
             old_temp = temp;
           }
         }
@@ -3378,7 +3370,7 @@ void Temperature::tick() {
           // if the temperature did not drop at least MIN_COOLING_SLOPE_DEG_BED
           if (!next_cool_check_ms || ELAPSED(now, next_cool_check_ms)) {
             if (old_temp - temp < float(MIN_COOLING_SLOPE_DEG_BED)) break;
-            next_cool_check_ms = now + 1000UL * MIN_COOLING_SLOPE_TIME_BED;
+            next_cool_check_ms = now + SEC_TO_MS(MIN_COOLING_SLOPE_TIME_BED);
             old_temp = temp;
           }
         }
@@ -3462,7 +3454,7 @@ void Temperature::tick() {
             SERIAL_ECHOLNPGM("Timed out waiting for probe temperature.");
             break;
           }
-          next_delta_check_ms = now + 1000UL * MIN_DELTA_SLOPE_TIME_PROBE;
+          next_delta_check_ms = now + SEC_TO_MS(MIN_DELTA_SLOPE_TIME_PROBE);
           old_temp = temp;
         }
 
@@ -3567,7 +3559,7 @@ void Temperature::tick() {
           // if the temperature did not drop at least MIN_COOLING_SLOPE_DEG_CHAMBER
           if (!next_cool_check_ms || ELAPSED(now, next_cool_check_ms)) {
             if (old_temp - temp < float(MIN_COOLING_SLOPE_DEG_CHAMBER)) break;
-            next_cool_check_ms = now + 1000UL * MIN_COOLING_SLOPE_TIME_CHAMBER;
+            next_cool_check_ms = now + SEC_TO_MS(MIN_COOLING_SLOPE_TIME_CHAMBER);
             old_temp = temp;
           }
         }
