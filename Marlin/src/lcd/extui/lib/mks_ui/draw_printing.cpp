@@ -124,7 +124,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
         lv_label_set_text(labelDet, gCfgItems.filament_det_enable ? operation_menu.filament_sensor_on : operation_menu.filament_sensor_off);
         update_spi_flash();
 
-        if (gCfgItems.filament_det_enable) detector.reset();
+        detector.reset();
         break;
     #endif
   }

@@ -60,6 +60,7 @@ millis_t FilamentDetector::last_time;
 millis_t FilamentDetector::update_time;
 
 void FilamentDetector::reset() {
+  WRITE(BEEPER_PIN, LOW);
   uiCfg.filament_broken = false;
   last_pos = block_count = 0;
   last_time = millis();

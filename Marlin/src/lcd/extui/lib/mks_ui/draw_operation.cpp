@@ -110,8 +110,8 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
         lv_obj_align(label_PowerOff, buttonPowerOff, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
         lv_obj_refresh_ext_draw_pad(label_PowerOff);
         update_spi_flash();
-        
-        if (gCfgItems.filament_det_enable) detector.reset();
+
+        detector.reset();
       #else
         if (gCfgItems.finish_power_off) {
           gCfgItems.finish_power_off = false;
