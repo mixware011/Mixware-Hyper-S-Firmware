@@ -566,8 +566,6 @@ typedef struct filament_menu_disp {
   const char *filament_dialog_ok;
   const char *filament_dialog_back;
   TERN_(MIXWARE_MODEL_V, const char *filament_dialog_wait_start;)
-  TERN_(MIXWARE_MODEL_V, const char *filament_dialog_load_select;)
-  TERN_(MIXWARE_MODEL_V, const char *filament_dialog_unload_select;)
   TERN_(MIXWARE_MODEL_V, const char *filament_clogging;)
 } filament_menu_def;
 
@@ -853,6 +851,14 @@ extern eeprom_def eeprom_menu;
   #define TEXT_5C             "5℃"
   #define TEXT_10C            "10℃"
   #define TEXT_5MM            "5 mm"
+  #define TEMP_200            "200"
+  #define TEMP_210            "210 (PLA)"
+  #define TEMP_220            "220"
+  #define TEMP_230            "230 (ABS)"
+  #define TEMP_240            "240"
+  #define TEMP_250            "250"
+  #define TEMP_260            "260"
+  #define TEMP_270            "270"
 
   typedef struct adjust_z_menu_disp {
     const char *title;
@@ -870,6 +876,19 @@ extern eeprom_def eeprom_menu;
     const char *failed;
   } autolevel_menu_def;
 
+  typedef struct filament_temp_select_disp {
+    const char *title;
+    const char *temp_200;
+    const char *temp_210;
+    const char *temp_220;
+    const char *temp_230;
+    const char *temp_240;
+    const char *temp_250;
+    const char *temp_260;
+    const char *temp_270;
+  } filament_temp_select_def;
+
   extern adjust_z_menu_def adjust_z_menu;
   extern autolevel_menu_def autolevel_menu;
+  extern filament_temp_select_def filament_temp_select;
 #endif

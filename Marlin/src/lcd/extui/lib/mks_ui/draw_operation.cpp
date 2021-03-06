@@ -34,6 +34,8 @@
 extern lv_group_t *g;
 static lv_obj_t *scr;
 
+extern bool flash_preview_begin, default_preview_flg;
+
 enum {
   ID_O_PRE_HEAT = 1,
   ID_O_EXTRUCT,
@@ -94,7 +96,11 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       break;
     case ID_O_RETURN:
       lv_clear_cur_ui();
-      lv_draw_return_ui();
+      if (gCfgItems.from_flash_pic)
+        flash_preview_begin = true;
+      else
+        default_preview_flg = true;
+      lv_draw_printing();
       break;
     case ID_O_POWER_OFF:
       #if ENABLED(MIXWARE_MODEL_V)

@@ -81,7 +81,8 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
         // else
         {
           lv_clear_filament_change();
-          lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_SELECT);
+          // lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_SELECT);
+          lv_draw_filament_temperature_select();
         }
       #else
         #if ENABLED(SINGLENOZZLE)
@@ -136,7 +137,8 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
         // else
         {
           lv_clear_filament_change();
-          lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_SELECT);
+          // lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_SELECT);
+          lv_draw_filament_temperature_select();
         }
       #else
       #if ENABLED(SINGLENOZZLE)
@@ -202,7 +204,11 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       uiCfg.filament_unloading_completed   = 0;
 
       lv_clear_cur_ui();
-      lv_draw_return_ui();
+      if (uiCfg.print_state == IDLE) {
+        lv_draw_tool();
+      }else {
+        lv_draw_operation();
+      }
       break;
     #if ENABLED(MIXWARE_MODEL_V)
       case ID_FILAMNT_RESUME:

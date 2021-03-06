@@ -384,6 +384,7 @@ typedef enum {
   HOME_DIR_UI,
   ENDSTOP_TYPE_UI,
   FILAMENT_SETTINGS_UI,
+  TERN_(MIXWARE_MODEL_V, FILAMENT_TEMPERATURE_SELECT_UI),
   TERN_(MIXWARE_MODEL_V, LEVEL_SELECT_UI),
   TERN_(MIXWARE_MODEL_V, ADJUST_Z_OFFSET_UI),
   LEVELING_SETTIGNS_UI,
@@ -506,6 +507,7 @@ extern keyboard_value_state keyboard_value;
   #include "draw_adjust_z_offset.h"
   #include "draw_level_select.h"
   #include "printer_filament_det.h"
+  #include "draw_filament_temperature_select.h"
 
   #undef TFT_LV_PARA_BACK_BODY_COLOR
   #define TFT_LV_PARA_BACK_BODY_COLOR  LV_COLOR_MAKE(0xF1, 0x5A, 0x20)

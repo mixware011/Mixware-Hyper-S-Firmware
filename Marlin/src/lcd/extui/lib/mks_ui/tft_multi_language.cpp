@@ -62,6 +62,7 @@ eeprom_def                   eeprom_menu;
 #if ENABLED(MIXWARE_MODEL_V)
   adjust_z_menu_def   adjust_z_menu;
   autolevel_menu_def  autolevel_menu;
+  filament_temp_select_def filament_temp_select;
 #endif
 
 machine_common_def machine_menu;
@@ -2889,6 +2890,15 @@ void disp_language_init() {
     machine_menu.FilamentConfTitle                  = FILAMENT_DIALOG_BREAK_TITLE_EN;
     machine_menu.FilamentDetPausing                 = FILAMENT_DIALOG_BREAKING_EN;
 
+    filament_temp_select.temp_200                   = TEMP_200;
+    filament_temp_select.temp_210                   = TEMP_210;
+    filament_temp_select.temp_220                   = TEMP_220;
+    filament_temp_select.temp_230                   = TEMP_230;
+    filament_temp_select.temp_240                   = TEMP_240;
+    filament_temp_select.temp_250                   = TEMP_250;
+    filament_temp_select.temp_260                   = TEMP_260;
+    filament_temp_select.temp_270                   = TEMP_270;
+
     switch (gCfgItems.language) {
       case LANG_SIMPLE_CHINESE:
         adjust_z_menu.title                         = OFFSET_Z_CN;
@@ -2902,8 +2912,6 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_CN;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_CN;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_CN;
-        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_CN;
-        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_CN;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_CN;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_CN;
         leveling_menu.z_offset                      = OFFSET_Z_CN;
@@ -2911,6 +2919,7 @@ void disp_language_init() {
         operation_menu.filament_sensor_off          = FILAMENT_SENSOR_OFF_CN;
         machine_menu.FilamentConfTitle              = FILAMENT_DIALOG_BREAK_TITLE_CN;
         machine_menu.FilamentDetPausing             = FILAMENT_DIALOG_BREAKING_CN;
+        filament_temp_select.title                  = PRINTING_TEMP_CN;
         break;
       case LANG_COMPLEX_CHINESE:
         adjust_z_menu.title                         = OFFSET_Z_T_CN;
@@ -2924,8 +2933,6 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_T_CN;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_T_CN;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_T_CN;
-        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_T_CN;
-        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_T_CN;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_T_CN;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_T_CN;
         leveling_menu.z_offset                      = OFFSET_Z_T_CN;
@@ -2933,24 +2940,7 @@ void disp_language_init() {
         operation_menu.filament_sensor_off          = FILAMENT_SENSOR_OFF_T_CN;
         machine_menu.FilamentConfTitle              = FILAMENT_DIALOG_BREAK_TITLE_T_CN;
         machine_menu.FilamentDetPausing             = FILAMENT_DIALOG_BREAKING_T_CN;
-        break;
-      case LANG_ENGLISH:
-        adjust_z_menu.title                         = OFFSET_Z_EN;
-        adjust_z_menu.save                          = ADJUST_Z_MENU_SAVE_EN;
-        adjust_z_menu.add                           = ADJUST_Z_MENU_ADD_EN;
-        adjust_z_menu.dec                           = ADJUST_Z_MENU_DEC_EN;
-        adjust_z_menu.wait_start                    = MENU_WAIT_START_EN;
-        autolevel_menu.title                        = AUTO_LEVELING_TITLE_EN;
-        autolevel_menu.completed                    = AUTO_LEVELING_COMPLETED_EN;
-        autolevel_menu.leveling                     = AUTO_LEVELING_LEVELING_EN;
-        autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_EN;
-        autolevel_menu.failed                       = AUTO_LEVELING_FAILED_EN;
-        filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_EN;
-        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_EN;
-        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_EN;
-        filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_EN;
-        home_menu.motor_off                         = MOTOR_OFF_TEXT_EN;
-        leveling_menu.z_offset                      = OFFSET_Z_EN;
+        filament_temp_select.title                  = PRINTING_TEMP_T_CN;
         break;
       case LANG_RUSSIAN:
         adjust_z_menu.title                         = OFFSET_Z_RU;
@@ -2964,11 +2954,10 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_RU;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_RU;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_RU;
-        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_RU;
-        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_RU;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_RU;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_RU;
         leveling_menu.z_offset                      = OFFSET_Z_RU;
+        filament_temp_select.title                  = PRINTING_TEMP_RU;
         break;
       case LANG_SPANISH:
         adjust_z_menu.title                         = OFFSET_Z_SP;
@@ -2982,11 +2971,10 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_SP;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_SP;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_SP;
-        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_SP;
-        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_SP;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_SP;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_SP;
         leveling_menu.z_offset                      = OFFSET_Z_SP;
+        filament_temp_select.title                  = PRINTING_TEMP_SP;
         break;
       case LANG_FRENCH:
         adjust_z_menu.title                         = OFFSET_Z_FR;
@@ -3000,11 +2988,10 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_FR;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_FR;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_FR;
-        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_FR;
-        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_FR;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_FR;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_FR;
         leveling_menu.z_offset                      = OFFSET_Z_FR;
+        filament_temp_select.title                  = PRINTING_TEMP_FR;
         break;
       case LANG_ITALY:
         adjust_z_menu.title                         = OFFSET_Z_IT;
@@ -3018,11 +3005,10 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_IT;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_IT;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_IT;
-        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_IT;
-        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_IT;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_IT;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_IT;
         leveling_menu.z_offset                      = OFFSET_Z_IT;
+        filament_temp_select.title                  = PRINTING_TEMP_IT;
         break;
       default:
         adjust_z_menu.title                         = OFFSET_Z_EN;
@@ -3036,11 +3022,10 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_EN;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_EN;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_EN;
-        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_EN;
-        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_EN;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_EN;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_EN;
         leveling_menu.z_offset                      = OFFSET_Z_EN;
+        filament_temp_select.title                  = PRINTING_TEMP_EN;
         break;
     }
   #endif

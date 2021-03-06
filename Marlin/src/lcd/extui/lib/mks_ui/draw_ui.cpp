@@ -551,6 +551,9 @@ char *getDispText(int index) {
       strcpy(public_buf_l, filament_menu.title);
       break;
     #if ENABLED(MIXWARE_MODEL_V)
+      case FILAMENT_TEMPERATURE_SELECT_UI:
+        strcpy(public_buf_l, filament_temp_select.title);
+        break;
       case ADJUST_Z_OFFSET_UI:
         strcpy(public_buf_l, adjust_z_menu.title);
       case LEVEL_SELECT_UI:
@@ -1082,6 +1085,7 @@ void lv_clear_cur_ui() {
     #if ENABLED(MIXWARE_MODEL_V)
       case ADJUST_Z_OFFSET_UI:        lv_clear_adjust_z_offset(); break;
       case LEVEL_SELECT_UI:           lv_clear_level_select(); break;
+      case FILAMENT_TEMPERATURE_SELECT_UI: lv_clear_filament_temperature_select(); break;
     #endif
     default: break;
   }
