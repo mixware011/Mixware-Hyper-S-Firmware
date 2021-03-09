@@ -566,6 +566,8 @@ typedef struct filament_menu_disp {
   const char *filament_dialog_ok;
   const char *filament_dialog_back;
   TERN_(MIXWARE_MODEL_V, const char *filament_dialog_wait_start;)
+  TERN_(MIXWARE_MODEL_V, const char *filament_dialog_load_select;)
+  TERN_(MIXWARE_MODEL_V, const char *filament_dialog_unload_select;)
   TERN_(MIXWARE_MODEL_V, const char *filament_clogging;)
 } filament_menu_def;
 

@@ -81,8 +81,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
         // else
         {
           lv_clear_filament_change();
-          // lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_SELECT);
-          lv_draw_filament_temperature_select();
+          lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_SELECT);
         }
       #else
         #if ENABLED(SINGLENOZZLE)
@@ -137,8 +136,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
         // else
         {
           lv_clear_filament_change();
-          // lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_SELECT);
-          lv_draw_filament_temperature_select();
+          lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_SELECT);
         }
       #else
       #if ENABLED(SINGLENOZZLE)

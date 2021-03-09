@@ -158,7 +158,23 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
 }
 
 void lv_draw_filament_temperature_select(void) {
-  scr = lv_screen_create(FILAMENT_TEMPERATURE_SELECT_UI);
+  scr = lv_obj_create(nullptr, nullptr);
+  lv_obj_set_style(scr, &tft_style_scr);
+  lv_scr_load(scr);
+  lv_obj_clean(scr);
+
+  // breadcrumbs
+  // if (disp_state_stack._disp_state[disp_state_stack._disp_index] != FILAMENT_TEMPERATURE_SELECT_UI) {
+  //   disp_state_stack._disp_index++;
+  //   disp_state_stack._disp_state[disp_state_stack._disp_index] = FILAMENT_TEMPERATURE_SELECT_UI;
+  // }
+  disp_state = FILAMENT_TEMPERATURE_SELECT_UI;
+
+  // title
+  lv_obj_t *titleLabel = lv_label_create(scr, TITLE_XPOS, TITLE_YPOS, filament_temp_select.title);
+  lv_obj_set_style(titleLabel, &tft_style_label_rel);
+
+  lv_refr_now(lv_refr_get_disp_refreshing());
 
   lv_screen_menu_item(scr, filament_temp_select.temp_200, PARA_UI_POS_X, PARA_UI_POS_Y * 1, event_handler, ID_FILAMENT_TEMP_200, 0);
   lv_screen_menu_item(scr, filament_temp_select.temp_210, PARA_UI_POS_X, PARA_UI_POS_Y * 2, event_handler, ID_FILAMENT_TEMP_210, 1);

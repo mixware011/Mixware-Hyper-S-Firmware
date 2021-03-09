@@ -186,7 +186,7 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
   else if (DIALOG_IS(TYPE_FILAMENT_HEAT_UNLOAD_COMPLETED))
     uiCfg.filament_heat_completed_unload = 1;
   else if (DIALOG_IS(TYPE_FILAMENT_LOAD_COMPLETED, TYPE_FILAMENT_UNLOAD_COMPLETED)) {
-    lv_clear_dialog();
+    lv_clear_cur_ui();
     lv_draw_filament_change();
   }
   #if ENABLED(MKS_WIFI_MODULE)
@@ -205,6 +205,56 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
       uiCfg.filament_heat_completed_load = 1;
       lv_clear_dialog();
       lv_draw_dialog(DIALOG_RUNOUT_LOAD);
+    }
+    else if (DIALOG_IS(TYPE_FILAMENT_LOAD_SELECT)) {
+      thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = PREHEAT_1_TEMP_HOTEND;
+      thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
+      gCfgItems.filament_limit_temper = PREHEAT_1_TEMP_HOTEND;
+
+      if (uiCfg.print_state == IDLE) {
+        uiCfg.leveling_first_time = 1;
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+      }
+      else if (uiCfg.print_state == WORKING) {
+        #if ENABLED(SDSUPPORT)
+          card.pauseSDPrint();
+          stop_print_time();
+          uiCfg.print_state = PAUSING;
+        #endif
+
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
+      }
+      else {
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_HEAT);
+      }
+    }
+    else if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_SELECT)) {
+      thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = PREHEAT_1_TEMP_HOTEND;
+      thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
+      gCfgItems.filament_limit_temper = PREHEAT_1_TEMP_HOTEND;
+
+      if (uiCfg.print_state == IDLE) {
+        uiCfg.leveling_first_time = 1;
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+      }
+      else if (uiCfg.print_state == WORKING) {
+        #if ENABLED(SDSUPPORT)
+          card.pauseSDPrint();
+          stop_print_time();
+          uiCfg.print_state = PAUSING;
+        #endif
+
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
+      }
+      else {
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_HEAT);
+      }
     }
     #if HAS_ABL_NOT_UBL
       else if (DIALOG_IS(AUTO_LEVEL_COMPLETED)) {
@@ -260,6 +310,56 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
       lv_draw_printing();
       uiCfg.print_state = RESUMING;
     }
+    else if (DIALOG_IS(TYPE_FILAMENT_LOAD_SELECT)) {
+      thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = PREHEAT_2_TEMP_HOTEND;
+      thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
+      gCfgItems.filament_limit_temper = PREHEAT_2_TEMP_HOTEND;
+
+      if (uiCfg.print_state == IDLE) {
+        uiCfg.leveling_first_time = 1;
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+      }
+      else if (uiCfg.print_state == WORKING) {
+        #if ENABLED(SDSUPPORT)
+          card.pauseSDPrint();
+          stop_print_time();
+          uiCfg.print_state = PAUSING;
+        #endif
+
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
+      }
+      else {
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_HEAT);
+      }
+    }
+    else if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_SELECT)) {
+      thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = PREHEAT_2_TEMP_HOTEND;
+      thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
+      gCfgItems.filament_limit_temper = PREHEAT_2_TEMP_HOTEND;
+
+      if (uiCfg.print_state == IDLE) {
+        uiCfg.leveling_first_time = 1;
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_WAIT_START);
+      }
+      else if (uiCfg.print_state == WORKING) {
+        #if ENABLED(SDSUPPORT)
+          card.pauseSDPrint();
+          stop_print_time();
+          uiCfg.print_state = PAUSING;
+        #endif
+
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_PAUSING);
+      }
+      else {
+        lv_clear_dialog();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_HEAT);
+      }
+    }
     #if HAS_ABL_NOT_UBL
       else if (DIALOG_IS(AUTO_LEVELING)) {
 
@@ -276,6 +376,14 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
   else {
     lv_clear_cur_ui();
     lv_draw_return_ui();
+  }
+}
+
+static void btn_more_event_cb(lv_obj_t *btn, lv_event_t event) {
+  if (event != LV_EVENT_RELEASED) return;
+  if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_SELECT, TYPE_FILAMENT_LOAD_SELECT)) {
+    lv_clear_dialog();
+    lv_draw_filament_temperature_select();
   }
 }
 
@@ -403,6 +511,14 @@ void lv_draw_dialog(uint8_t type) {
       else if (DIALOG_IS(RUNOUT_FINISH)) {
         lv_label_set_text(labelOk, pause_msg_menu.purgeMore);        // Set the labels text
         lv_label_set_text(labelCancel, pause_msg_menu.continuePrint);
+      }
+      else if (DIALOG_IS(TYPE_FILAMENT_LOAD_SELECT, TYPE_FILAMENT_UNLOAD_SELECT)) {
+        lv_label_set_text(labelOk,     preheat_menu.heatPLA);        // Set the labels text
+        lv_label_set_text(labelCancel, preheat_menu.heatABS);
+
+        lv_obj_t *btnMore = lv_button_btn_create(scr, BTN_RIGHT_X, BTN_POS_Y+100, BTN_SIZE_WIDTH, BTN_SIZE_HEIGHT, btn_more_event_cb);
+        lv_obj_t *labelMore = lv_label_create_empty(btnMore);
+        lv_label_set_text(labelMore, main_menu.more);
       }
       #if HAS_ABL_NOT_UBL
         else if (DIALOG_IS(AUTO_LEVEL_FINISHED)) {
@@ -618,14 +734,14 @@ void lv_draw_dialog(uint8_t type) {
       lv_label_set_text(labelDialog, filament_menu.filament_dialog_wait_start);
       lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
     }
-    // else if (DIALOG_IS(TYPE_FILAMENT_LOAD_SELECT)) {
-    //   lv_label_set_text(labelDialog, filament_menu.filament_dialog_load_select);
-    //   lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -70);
-    // }
-    // else if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_SELECT)) {
-    //   lv_label_set_text(labelDialog, filament_menu.filament_dialog_unload_select);
-    //   lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -70);
-    // }
+    else if (DIALOG_IS(TYPE_FILAMENT_LOAD_SELECT)) {
+      lv_label_set_text(labelDialog, filament_menu.filament_dialog_load_select);
+      lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -70);
+    }
+    else if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_SELECT)) {
+      lv_label_set_text(labelDialog, filament_menu.filament_dialog_unload_select);
+      lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -70);
+    }
     else if (DIALOG_IS(RUNOUT_LOADTIPS)) {
       lv_label_set_text(labelDialog, filament_menu.filament_dialog_load_heat_confirm);
       lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);

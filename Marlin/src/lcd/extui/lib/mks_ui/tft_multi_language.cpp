@@ -2912,6 +2912,8 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_CN;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_CN;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_CN;
+        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_CN;
+        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_CN;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_CN;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_CN;
         leveling_menu.z_offset                      = OFFSET_Z_CN;
@@ -2933,6 +2935,8 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_T_CN;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_T_CN;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_T_CN;
+        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_T_CN;
+        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_T_CN;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_T_CN;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_T_CN;
         leveling_menu.z_offset                      = OFFSET_Z_T_CN;
@@ -2954,6 +2958,8 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_RU;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_RU;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_RU;
+        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_RU;
+        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_RU;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_RU;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_RU;
         leveling_menu.z_offset                      = OFFSET_Z_RU;
@@ -2971,6 +2977,8 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_SP;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_SP;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_SP;
+        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_SP;
+        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_SP;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_SP;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_SP;
         leveling_menu.z_offset                      = OFFSET_Z_SP;
@@ -2988,6 +2996,8 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_FR;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_FR;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_FR;
+        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_FR;
+        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_FR;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_FR;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_FR;
         leveling_menu.z_offset                      = OFFSET_Z_FR;
@@ -3005,6 +3015,8 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_IT;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_IT;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_IT;
+        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_IT;
+        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_IT;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_IT;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_IT;
         leveling_menu.z_offset                      = OFFSET_Z_IT;
@@ -3022,6 +3034,8 @@ void disp_language_init() {
         autolevel_menu.finished                     = AUTO_LEVELING_FINISHED_EN;
         autolevel_menu.failed                       = AUTO_LEVELING_FAILED_EN;
         filament_menu.filament_dialog_wait_start    = MENU_WAIT_START_EN;
+        filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_EN;
+        filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_EN;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_EN;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_EN;
         leveling_menu.z_offset                      = OFFSET_Z_EN;
