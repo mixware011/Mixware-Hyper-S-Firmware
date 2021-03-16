@@ -513,6 +513,7 @@
   #undef PAUSE_POSITION_X_T_CN
   #undef PAUSE_POSITION_Y_T_CN
   #undef PAUSE_POSITION_Z_T_CN
+  #undef TITLE_LEVELING_T_CN
 
   #define OFFSET_X_T_CN                           "X軸偏移補償"
   #define OFFSET_Y_T_CN                           "Y軸偏移補償"
@@ -545,4 +546,5 @@
   #define PAUSE_POSITION_Y_T_CN                   "Y軸暫停位置(絕對位置)"
   #define PAUSE_POSITION_Z_T_CN                   "Z軸暫停位置(相對位置)"
   #define PAUSE_POSITION_TIPS_T_CN                "提示: -1無效"
+  #define TITLE_LEVELING_T_CN                       "手動调平"
 #endif

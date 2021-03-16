@@ -41,6 +41,7 @@ static lv_obj_t * scr;
 enum {
   ID_LEVEL_SELECT_AUTO = 1,
   ID_LEVEL_SELECT_MANUAL,
+  ID_LEVEL_SELECT_MAIN,
   ID_LEVEL_SELECT_HEIGHT,
   ID_LEVEL_SELECT_RETURN
 };
@@ -49,6 +50,7 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
   if (event != LV_EVENT_RELEASED) return;
   switch (obj->mks_obj_id) {
     case ID_LEVEL_SELECT_AUTO:
+      uiCfg.para_ui_page = 0;
       #if HAS_ABL_NOT_UBL
         lv_clear_level_select();
         lv_draw_dialog(DIALOG_AUTO_LEVEL_COMPLETED);
@@ -56,6 +58,7 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
       break;
     case ID_LEVEL_SELECT_MANUAL:
       uiCfg.leveling_first_time = 1;
+      uiCfg.para_ui_page = 0;
       lv_clear_level_select();
       lv_draw_manualLevel();
       break;
@@ -66,9 +69,20 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
       lv_draw_dialog(DIALOG_ADJUST_Z_HEIGHT_WAIT_START);
       break;
     case ID_LEVEL_SELECT_RETURN:
+        lv_clear_level_select();
+      if (uiCfg.para_ui_page) {
+        uiCfg.para_ui_page = 0;
+        lv_draw_level_select();
+      }
+      else {
+        disp_state_stack._disp_index = 2;
+        lv_draw_tool();
+      }
+      break;
+    case ID_LEVEL_SELECT_MAIN:
       lv_clear_level_select();
-      disp_state_stack._disp_index = 2;
-      lv_draw_tool();
+      uiCfg.para_ui_page = 1;
+      lv_draw_level_select();
       break;
   }
 }
@@ -76,13 +90,15 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
 void lv_draw_level_select(void) {
   scr = lv_screen_create(LEVEL_SELECT_UI);
 
-  #if HAS_ABL_NOT_UBL
-    lv_big_button_create(scr, "F:/img_level_auto.bin", tool_menu.autoleveling,  button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_LEVEL_SELECT_AUTO);
-  #else
-    lv_big_button_create(scr, "F:/img_level_manual.bin", tool_menu.leveling,  button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_LEVEL_SELECT_MANUAL);
-  #endif
+  if (uiCfg.para_ui_page == 0) {
+    lv_big_button_create(scr, "F:/img_level2.bin", tool_menu.leveling,  button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_LEVEL_SELECT_MAIN);
+    lv_big_button_create(scr, "F:/img_level_z_offset.bin", leveling_menu.z_offset,  button_pixel_point[3].x, button_pixel_point[3].y, event_handler, ID_LEVEL_SELECT_HEIGHT);
+  }
+  else {
+    lv_big_button_create(scr, "F:/img_level_manual.bin", leveling_menu.title,    button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_LEVEL_SELECT_MANUAL);
+    lv_big_button_create(scr, "F:/img_level_auto.bin",   tool_menu.autoleveling, button_pixel_point[3].x, button_pixel_point[3].y, event_handler, ID_LEVEL_SELECT_AUTO);
+  }
 
-  lv_big_button_create(scr, "F:/img_level_z_offset.bin", leveling_menu.z_offset,  button_pixel_point[3].x, button_pixel_point[3].y, event_handler, ID_LEVEL_SELECT_HEIGHT);
   lv_screen_menu_item_return(scr, event_handler, ID_LEVEL_SELECT_RETURN);
 }
 

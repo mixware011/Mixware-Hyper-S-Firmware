@@ -376,6 +376,7 @@
   #undef FILAMENT_EXT1_TEXT_RU
   #undef EEPROM_SETTINGS_STORE_RU
   #undef EEPROM_STORE_TIPS_RU
+  #undef TITLE_LEVELING_RU
 
   // #define OFFSET_Z_RU                           "Z смещение"
   #define ADJUST_Z_MENU_SAVE_RU                 "Сохранить"
@@ -399,4 +400,5 @@
   #define AUTO_LEVELING_FAILED_RU               "Auto leveling failed, click <confirm> for return!"
   #define EEPROM_SETTINGS_STORE_RU              "Сохранить настройки на принтере"
   #define EEPROM_STORE_TIPS_RU                  "Сохранить настройки на принтере?"
+  #define TITLE_LEVELING_RU                     "Manual Level"
 #endif

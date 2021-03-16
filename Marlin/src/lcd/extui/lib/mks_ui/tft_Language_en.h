@@ -746,6 +746,7 @@
   #undef PAUSE_POSITION_X_EN
   #undef PAUSE_POSITION_Y_EN
   #undef PAUSE_POSITION_Z_EN
+  #undef TITLE_LEVELING_EN
 
   #define ADJUST_Z_MENU_SAVE_EN                 "Save"
   #define ADJUST_Z_MENU_ADD_EN                  "Up Nozzle"
@@ -775,4 +776,5 @@
   #define PAUSE_POSITION_Y_EN                   "Y-axis(Absolute position)"
   #define PAUSE_POSITION_Z_EN                   "Z-axis(Relative position)"
   #define PAUSE_POSITION_TIPS_EN                "(Tips: -1 invalid)"
+  #define TITLE_LEVELING_EN                     "Manual Level"
 #endif

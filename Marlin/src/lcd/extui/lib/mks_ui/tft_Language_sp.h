@@ -280,6 +280,7 @@
   #undef FILAMENT_EXT1_TEXT_SP
   #undef EEPROM_SETTINGS_STORE_SP
   #undef EEPROM_STORE_TIPS_SP
+  #undef TITLE_LEVELING_SP
 
   #define OFFSET_Z_SP                           "Z Compensar"
   #define ADJUST_Z_MENU_SAVE_SP                 "Salvar"
@@ -303,4 +304,5 @@
   #define AUTO_LEVELING_FAILED_SP               "Error con el nivel automÃ¡tico, \nhaga clic en <confirmar> para volver!"
   #define EEPROM_SETTINGS_STORE_SP              "Guardar la configuración en la impresora"
   #define EEPROM_STORE_TIPS_SP                  "Guardar la configuración en la impresora?"
+  #define TITLE_LEVELING_SP                     "Manual Level"
 #endif

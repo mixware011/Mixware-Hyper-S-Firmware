@@ -143,11 +143,8 @@ void lv_draw_set(void) {
   #if HAS_LANG_SELECT_SCREEN
     lv_big_button_create(scr, "F:/img_language.bin", set_menu.language, button_pixel_point[3].x, button_pixel_point[3].y, event_handler, ID_S_LANGUAGE);
   #endif
-  #if ENABLED(AUTO_BED_LEVELING_BILINEAR)
-    lv_big_button_create(scr, "F:/img_level_manual.bin", tool_menu.leveling, button_pixel_point[4].x, button_pixel_point[4].y, event_handler, ID_S_FAN);
-  #endif
 
-  buttonFilamentDet = lv_imgbtn_create(scr, gCfgItems.filament_det_enable ? "F:img_run_out_on.bin" : "F:img_run_out_off.bin", button_pixel_point[5].x, button_pixel_point[5].y, event_handler, ID_S_FILAMENT_DET);
+  buttonFilamentDet = lv_imgbtn_create(scr, gCfgItems.filament_det_enable ? "F:img_run_out_on.bin" : "F:img_run_out_off.bin", button_pixel_point[4].x, button_pixel_point[4].y, event_handler, ID_S_FILAMENT_DET);
   labelFilamentDet = lv_label_create_empty(buttonFilamentDet);
   lv_label_set_text(labelFilamentDet, gCfgItems.filament_det_enable ? operation_menu.filament_sensor_on : operation_menu.filament_sensor_off);
   lv_obj_align(labelFilamentDet, buttonFilamentDet, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);

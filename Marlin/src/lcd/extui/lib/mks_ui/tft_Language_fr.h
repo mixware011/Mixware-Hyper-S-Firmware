@@ -274,6 +274,7 @@
   #undef FILAMENT_EXT1_TEXT_FR
   #undef EEPROM_SETTINGS_STORE_FR
   #undef EEPROM_STORE_TIPS_FR
+  #undef TITLE_LEVELING_FR
 
   #define OFFSET_Z_FR                           "Z contre-valeur"
   #define ADJUST_Z_MENU_SAVE_FR                 "La conservation"
@@ -297,4 +298,5 @@
   #define AUTO_LEVELING_FAILED_FR               "Ã‰chec du nivellement automatique, cliquez sur < confirmer > pour retour!"
   #define EEPROM_SETTINGS_STORE_FR              "Stocker les paramètres dans imprimante"
   #define EEPROM_STORE_TIPS_FR                  "Stocker les paramètres dans imprimante?"
+  #define TITLE_LEVELING_FR                     "Manual Level"
 #endif

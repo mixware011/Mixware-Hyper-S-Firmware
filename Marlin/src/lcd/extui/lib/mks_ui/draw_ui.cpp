@@ -557,6 +557,8 @@ char *getDispText(int index) {
       case ADJUST_Z_OFFSET_UI:
         strcpy(public_buf_l, adjust_z_menu.title);
       case LEVEL_SELECT_UI:
+        strcpy(public_buf_l, tool_menu.leveling);
+      break;
     #endif
     case LEVELING_UI:
     case MESHLEVELING_UI:

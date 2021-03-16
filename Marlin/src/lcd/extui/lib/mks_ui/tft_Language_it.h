@@ -271,6 +271,7 @@
   #undef FILAMENT_EXT1_TEXT_IT
   #undef EEPROM_SETTINGS_STORE_IT
   #undef EEPROM_STORE_TIPS_IT
+  #undef TITLE_LEVELING_IT
 
   #define OFFSET_Z_IT                           "Z scostamento"
   #define ADJUST_Z_MENU_SAVE_IT                 "Salva"
@@ -294,4 +295,5 @@
   #define AUTO_LEVELING_FAILED_IT               "Livellamento automatico non riuscito, fai clic su <conferma> per il ritorno!"
   #define EEPROM_SETTINGS_STORE_IT              "Memorizzare le impostazioni su tipografo"
   #define EEPROM_STORE_TIPS_IT                  "Memorizzare le impostazioni su tipografo?"
+  #define TITLE_LEVELING_IT                     "Manuale Livel"
 #endif

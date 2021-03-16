@@ -53,6 +53,7 @@ static const char assets[][LONG_FILENAME_LENGTH] = {
   "img_fan.bin",
   "img_filamentchange.bin",
   "img_level.bin",
+  "img_level2.bin",
   "img_move.bin",
   "img_home.bin",
   // "img_more.bin",

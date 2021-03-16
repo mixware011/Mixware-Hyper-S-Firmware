@@ -78,6 +78,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
     case ID_T_LEVELING:
       #if ENABLED(MIXWARE_MODEL_V)
         lv_clear_tool();
+        uiCfg.para_ui_page = 0;
         lv_draw_level_select();
       #else
         #if ENABLED(AUTO_BED_LEVELING_BILINEAR)
