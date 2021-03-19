@@ -379,6 +379,7 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
   }
 }
 
+#if ENABLED(MIXWARE_MODEL_V)
 static void btn_more_event_cb(lv_obj_t *btn, lv_event_t event) {
   if (event != LV_EVENT_RELEASED) return;
   if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_SELECT, TYPE_FILAMENT_LOAD_SELECT)) {
@@ -386,6 +387,7 @@ static void btn_more_event_cb(lv_obj_t *btn, lv_event_t event) {
     lv_draw_filament_temperature_select();
   }
 }
+#endif
 
 void lv_draw_dialog(uint8_t type) {
   lv_obj_t *btnOk = nullptr, *btnCancel = nullptr;
