@@ -62,16 +62,16 @@ void printer_state_polling() {
 
       if (gCfgItems.pausePosZ != (float)-1) {
         gcode.process_subcommands_now_P(PSTR("G91"));
-        sprintf_P(public_buf_l, PSTR("G1 Z%s"), dtostrf(gCfgItems.pausePosZ, 1, 1, str_1));
+        sprintf_P(public_buf_l, PSTR("G1 Z%s F1000"), dtostrf(gCfgItems.pausePosZ, 1, 1, str_1));
         gcode.process_subcommands_now(public_buf_l);
         gcode.process_subcommands_now_P(PSTR("G90"));
       }
       if (gCfgItems.pausePosX != (float)-1) {
-        sprintf_P(public_buf_l, PSTR("G1 X%s"), dtostrf(gCfgItems.pausePosX, 1, 1, str_1));
+        sprintf_P(public_buf_l, PSTR("G1 X%s F2000"), dtostrf(gCfgItems.pausePosX, 1, 1, str_1));
         gcode.process_subcommands_now(public_buf_l);
       }
       if (gCfgItems.pausePosY != (float)-1) {
-        sprintf_P(public_buf_l, PSTR("G1 Y%s"), dtostrf(gCfgItems.pausePosY, 1, 1, str_1));
+        sprintf_P(public_buf_l, PSTR("G1 Y%s F2000"), dtostrf(gCfgItems.pausePosY, 1, 1, str_1));
         gcode.process_subcommands_now(public_buf_l);
       }
       uiCfg.print_state = PAUSED;
@@ -108,16 +108,16 @@ void printer_state_polling() {
   if (uiCfg.print_state == RESUMING) {
     if (IS_SD_PAUSED()) {
       if (gCfgItems.pausePosY != (float)-1) {
-        sprintf_P(public_buf_m, PSTR("G1 Y%s"), dtostrf(uiCfg.current_y_position_bak, 1, 1, str_1));
+        sprintf_P(public_buf_m, PSTR("G1 Y%s F2000"), dtostrf(uiCfg.current_y_position_bak, 1, 1, str_1));
         gcode.process_subcommands_now(public_buf_m);
       }
       if (gCfgItems.pausePosX != (float)-1) {
-        sprintf_P(public_buf_m, PSTR("G1 X%s"), dtostrf(uiCfg.current_x_position_bak, 1, 1, str_1));
+        sprintf_P(public_buf_m, PSTR("G1 X%s F2000"), dtostrf(uiCfg.current_x_position_bak, 1, 1, str_1));
         gcode.process_subcommands_now(public_buf_m);
       }
       if (gCfgItems.pausePosZ != (float)-1) {
         ZERO(public_buf_m);
-        sprintf_P(public_buf_m, PSTR("G1 Z%s"), dtostrf(uiCfg.current_z_position_bak, 1, 1, str_1));
+        sprintf_P(public_buf_m, PSTR("G1 Z%s F1000"), dtostrf(uiCfg.current_z_position_bak, 1, 1, str_1));
         gcode.process_subcommands_now(public_buf_m);
       }
       gcode.process_subcommands_now_P(M24_STR);

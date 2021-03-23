@@ -137,7 +137,7 @@
 
     // machine parameter ui
     #define PARA_UI_POS_X             10
-    #define PARA_UI_POS_Y             50
+    #define PARA_UI_POS_Y             47
 
     #define PARA_UI_SIZE_X            (TFT_WIDTH  - 30)
     #define PARA_UI_SIZE_Y            40

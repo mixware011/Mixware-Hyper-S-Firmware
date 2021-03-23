@@ -41,7 +41,8 @@ enum {
   ID_FILAMENT_TEMP_240 = 240,
   ID_FILAMENT_TEMP_250 = 250,
   ID_FILAMENT_TEMP_260 = 260,
-  ID_FILAMENT_TEMP_270 = 270
+  ID_FILAMENT_TEMP_270 = 270,
+  ID_FILAMENT_TEMP_RETURN
 };
 static void filament_temperature_set(int16_t t)
 {
@@ -154,6 +155,12 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
         filament_temperature_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_HEAT);
       }
       break;
+    case ID_FILAMENT_TEMP_RETURN:
+      uiCfg.filament_load_heat_flg = 0;
+      uiCfg.filament_unload_heat_flg = 0;
+      lv_clear_filament_temperature_select();
+      lv_draw_filament_change();
+      break;
   }
 }
 
@@ -163,11 +170,6 @@ void lv_draw_filament_temperature_select(void) {
   lv_scr_load(scr);
   lv_obj_clean(scr);
 
-  // breadcrumbs
-  // if (disp_state_stack._disp_state[disp_state_stack._disp_index] != FILAMENT_TEMPERATURE_SELECT_UI) {
-  //   disp_state_stack._disp_index++;
-  //   disp_state_stack._disp_state[disp_state_stack._disp_index] = FILAMENT_TEMPERATURE_SELECT_UI;
-  // }
   disp_state = FILAMENT_TEMPERATURE_SELECT_UI;
 
   // title
@@ -184,6 +186,8 @@ void lv_draw_filament_temperature_select(void) {
   lv_screen_menu_item(scr, filament_temp_select.temp_250, PARA_UI_POS_X, PARA_UI_POS_Y * 6, event_handler, ID_FILAMENT_TEMP_250, 5);
   lv_screen_menu_item(scr, filament_temp_select.temp_260, PARA_UI_POS_X, PARA_UI_POS_Y * 7, event_handler, ID_FILAMENT_TEMP_260, 6);
   lv_screen_menu_item(scr, filament_temp_select.temp_270, PARA_UI_POS_X, PARA_UI_POS_Y * 8, event_handler, ID_FILAMENT_TEMP_270, 7);
+
+  lv_screen_menu_item_return(scr, event_handler, ID_FILAMENT_TEMP_RETURN);
 }
 
 void lv_clear_filament_temperature_select() {

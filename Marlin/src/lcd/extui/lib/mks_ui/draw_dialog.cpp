@@ -387,6 +387,16 @@ static void btn_more_event_cb(lv_obj_t *btn, lv_event_t event) {
     lv_draw_filament_temperature_select();
   }
 }
+
+static void btn_return_event_cb(lv_obj_t *btn, lv_event_t event) {
+  if (event != LV_EVENT_RELEASED) return;
+  if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_SELECT, TYPE_FILAMENT_LOAD_SELECT)) {
+    uiCfg.filament_load_heat_flg = 0;
+    uiCfg.filament_unload_heat_flg = 0;
+    lv_clear_dialog();
+    lv_draw_filament_change();
+  }
+}
 #endif
 
 void lv_draw_dialog(uint8_t type) {
@@ -518,9 +528,13 @@ void lv_draw_dialog(uint8_t type) {
         lv_label_set_text(labelOk,     preheat_menu.heatPLA);        // Set the labels text
         lv_label_set_text(labelCancel, preheat_menu.heatABS);
 
-        lv_obj_t *btnMore = lv_button_btn_create(scr, BTN_RIGHT_X, BTN_POS_Y+100, BTN_SIZE_WIDTH, BTN_SIZE_HEIGHT, btn_more_event_cb);
+        lv_obj_t *btnMore = lv_button_btn_create(scr, BTN_LEFT_X, BTN_POS_Y+100, BTN_SIZE_WIDTH, BTN_SIZE_HEIGHT, btn_more_event_cb);
         lv_obj_t *labelMore = lv_label_create_empty(btnMore);
         lv_label_set_text(labelMore, main_menu.more);
+
+        lv_obj_t *btnReturn = lv_button_btn_create(scr, BTN_RIGHT_X, BTN_POS_Y+100, BTN_SIZE_WIDTH, BTN_SIZE_HEIGHT, btn_return_event_cb);
+        lv_obj_t *labelReturn = lv_label_create_empty(btnReturn);
+        lv_label_set_text(labelReturn, common_menu.text_back);
       }
       #if HAS_ABL_NOT_UBL
         else if (DIALOG_IS(AUTO_LEVEL_FINISHED)) {
