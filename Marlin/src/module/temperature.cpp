@@ -1212,7 +1212,7 @@ void Temperature::manage_heater() {
               else if (temp_bed.celsius <= temp_bed.target - (BED_HYSTERESIS))
                 temp_bed.soft_pwm_amount = MAX_BED_POWER >> 1;
             #else // !PIDTEMPBED && !BED_LIMIT_SWITCHING
-              temp_bed.soft_pwm_amount = temp_bed.celsius < temp_bed.target ? (temp_bed.celsius < 70 ? MAX_BED_POWER : temp_bed.celsius < 80 ? 220 : temp_bed.celsius < 90 ? 235 : 255) >> 1 : 0;
+              temp_bed.soft_pwm_amount = temp_bed.celsius < temp_bed.target ? (temp_bed.celsius < 70 ? 190 : temp_bed.celsius < 80 ? 208 : temp_bed.celsius < 90 ? 220 : 238) >> 1 : 0;
             #endif
           }
           else {
