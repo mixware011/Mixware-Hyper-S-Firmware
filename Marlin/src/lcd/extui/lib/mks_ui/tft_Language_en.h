@@ -777,4 +777,7 @@
   #define PAUSE_POSITION_Z_EN                   "Z-axis(Relative position)"
   #define PAUSE_POSITION_TIPS_EN                "(Tips: -1 invalid)"
   #define TITLE_LEVELING_EN                     "Manual Level"
+
+  #define AXIS_TEST_Z_EN                        "Z-axis Test"
+  #define AXIS_TESTING_Z_EN                     "Z-axis Testing"
 #endif

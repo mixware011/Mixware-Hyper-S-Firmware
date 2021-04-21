@@ -100,6 +100,7 @@ lv_point_t line_points[8][2] = {
 
 #if ENABLED(MIXWARE_MODEL_V)
   mixware_level_state level_state;
+  bool axis_z_test_start_flag;
   bool level_update_flag;
   bool offset_save_flag;
 
@@ -160,9 +161,9 @@ void gCfgItems_init() {
   gCfgItems.wifi_mode_sel = STA_MODEL;
   gCfgItems.fileSysType   = FILE_SYS_SD;
   gCfgItems.wifi_type     = ESP_WIFI;
-  gCfgItems.filamentchange_load_length   = TERN(MIXWARE_MODEL_V, 100, 200);
+  gCfgItems.filamentchange_load_length   = TERN(MIXWARE_MODEL_V, 100,  200);
   gCfgItems.filamentchange_load_speed    = TERN(MIXWARE_MODEL_V, 300, 1000);
-  gCfgItems.filamentchange_unload_length = TERN(MIXWARE_MODEL_V, 100, 200);
+  gCfgItems.filamentchange_unload_length = TERN(MIXWARE_MODEL_V,  80,  200);
   gCfgItems.filamentchange_unload_speed  = TERN(MIXWARE_MODEL_V, 300, 1000);
   gCfgItems.filament_limit_temper        = 200;
 
@@ -823,7 +824,10 @@ void GUI_RefreshPage() {
   if ((systick_uptime_millis % 1000) == 0) temps_update_flag = true;
   if ((systick_uptime_millis % 1200) == 0) printing_rate_update_flag = true;
   #if ENABLED(MIXWARE_MODEL_V)
-    if ((systick_uptime_millis % 1000) == 0) level_update_flag = true;
+    if ((systick_uptime_millis % 1000) == 0) {
+      level_update_flag = true;
+      axis_z_test_start_flag = true;
+    }
   #endif
 
   switch (disp_state) {
@@ -912,6 +916,7 @@ void GUI_RefreshPage() {
         if(uiCfg.filament_broken) runout_dialog_handle();
         else filament_dialog_handle();
         auto_leveling_dialog_handle();
+        axis_z_test_dialog_handle();
       #else
         filament_dialog_handle();
         TERN_(MKS_WIFI_MODULE, wifi_scan_handle());

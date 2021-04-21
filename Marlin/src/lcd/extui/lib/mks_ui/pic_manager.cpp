@@ -112,6 +112,7 @@ static const char assets[][LONG_FILENAME_LENGTH] = {
   "img_eeprom.bin",
   "img_about.bin",
   "img_machine_para.bin",
+  "img_axis_z_test.bin",
 
   //lang select screen
   #if HAS_LANG_SELECT_SCREEN

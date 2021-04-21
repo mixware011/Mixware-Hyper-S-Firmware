@@ -374,7 +374,7 @@
 
 #define FILAMENT_DIALOG_LOAD_HEAT_TIPS_T_CN       "準備進料,正在加熱,請稍等"
 #define FILAMENT_DIALOG_UNLOAD_HEAT_TIPS_T_CN     "準備退料,正在加熱,請稍等"
-#define FILAMENT_DIALOG_LOAD_CONFIRM1_TIPS_T_CN   "加熱完成,請裝載耗材后,按<確定>開始進料"
+#define FILAMENT_DIALOG_LOAD_CONFIRM1_TIPS_T_CN   "加熱完成,請裝載耗材后,\n按<確定>開始進料"
 #define FILAMENT_DIALOG_LOAD_CONFIRM2_TIPS_T_CN   "請裝載耗,按<確定>開始進料!"
 #define FILAMENT_DIALOG_UNLOAD_CONFIRM_TIPS_T_CN  "加熱完成,请按<確定>開始退料!"
 #define FILAMENT_DIALOG_LOADING_TIPS_T_CN         "正在進料,请等待耗材加載完成!"
@@ -547,4 +547,7 @@
   #define PAUSE_POSITION_Z_T_CN                   "Z軸暫停位置(相對位置)"
   #define PAUSE_POSITION_TIPS_T_CN                "提示: -1無效"
   #define TITLE_LEVELING_T_CN                       "手動调平"
+
+  #define AXIS_TEST_Z_T_CN                        "Z軸調試"
+  #define AXIS_TESTING_Z_T_CN                     "正在進行Z軸調試"
 #endif

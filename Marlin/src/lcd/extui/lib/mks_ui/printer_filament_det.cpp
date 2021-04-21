@@ -50,6 +50,10 @@ FilamentDetector detector;
   #define FILAMENT_DETECTOR_BLOCK_LENGHT 2400
 #endif
 
+#ifndef FILAMENT_DETECTOR_FILE_START_POS
+  #define FILAMENT_DETECTOR_FILE_START_POS 512
+#endif
+
 int32_t FilamentDetector::last_pos;
 int32_t FilamentDetector::cur_pos;
 int32_t FilamentDetector::alarm_gap;
@@ -69,7 +73,7 @@ void FilamentDetector::reset() {
 }
 
 void FilamentDetector::update() {
-  if (!gCfgItems.filament_det_enable)
+  if (!gCfgItems.filament_det_enable || card.getIndex() < FILAMENT_DETECTOR_FILE_START_POS)
     return;
 
   static uint8_t last_state = 0;

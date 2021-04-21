@@ -92,6 +92,7 @@ enum {
   ,DIALOG_AUTO_LEVEL_FINISHED
   ,DIALOG_AUTO_LEVEL_LEVELERR
   ,DIALOG_ADJUST_Z_HEIGHT_WAIT_START
+  ,DIALOG_AXIS_Z_TEST
 #endif
 };
 
@@ -114,6 +115,7 @@ extern void lv_filament_setbar();
   #define BTN_SIZE_WIDTH  120
   #define BTN_SIZE_HEIGHT 60
 
+  extern void axis_z_test_dialog_handle();
   extern void auto_leveling_dialog_handle();
   extern void runout_dialog_handle();
 #endif

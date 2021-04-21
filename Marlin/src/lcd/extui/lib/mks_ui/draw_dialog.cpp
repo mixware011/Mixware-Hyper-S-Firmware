@@ -57,6 +57,7 @@
 
 #if ENABLED(MIXWARE_MODEL_V)
   #include "printer_filament_det.h"
+  #include "../../../../module/stepper.h"
   extern bool flash_preview_begin, default_preview_flg, level_update_flag;
 #endif
 
@@ -372,6 +373,11 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
         lv_draw_dialog(DIALOG_ADJUST_Z_HEIGHT_WAIT_START);
       }
     #endif
+    else if (DIALOG_IS(AXIS_Z_TEST)) {
+      queue.enqueue_one_P(PSTR("M410"));
+      lv_clear_dialog();
+      lv_draw_set();
+    }
   #endif
   else {
     lv_clear_cur_ui();
@@ -496,6 +502,12 @@ void lv_draw_dialog(uint8_t type) {
       lv_bar_set_style(filament_bar, LV_BAR_STYLE_INDIC, &lv_bar_style_indic);
       lv_bar_set_anim_time(filament_bar, 1000);
       lv_bar_set_value(filament_bar, 0, LV_ANIM_ON);
+    }
+    else if (DIALOG_IS(AXIS_Z_TEST)) {
+      //nothing to do
+      btnCancel = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_CENTER_X, (BTN_OK_X + 90)), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_OK_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_cancel_event_cb);
+      lv_obj_t *labelCancel = lv_label_create_empty(btnCancel);
+      lv_label_set_text(labelCancel, print_file_dialog_menu.cancel);
     }
     #if HAS_ABL_NOT_UBL
       else if (DIALOG_IS(AUTO_LEVELING)) {
@@ -812,6 +824,10 @@ void lv_draw_dialog(uint8_t type) {
         lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -70);
       }
     #endif
+    else if (DIALOG_IS(AXIS_Z_TEST)) {
+      lv_label_set_text(labelDialog, set_menu.axisztesting);
+      lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
+    }
   #endif
 
   #if HAS_ROTARY_ENCODER
@@ -957,6 +973,24 @@ void lv_clear_dialog() {
 }
 
 #if ENABLED(MIXWARE_MODEL_V)
+void axis_z_test_dialog_handle() {
+	if(axis_z_test_start_flag) {
+		axis_z_test_start_flag = false;
+    if (DIALOG_IS(AXIS_Z_TEST)) {
+      if (uiCfg.leveling_first_time) {
+        uiCfg.leveling_first_time = 0;
+        if (!all_axes_trusted()) gcode.process_subcommands_now(PSTR("G28"));
+        gcode.process_subcommands_now_P(PSTR("G1 X150 Y100 F2000\nG1 Z399 F300\nG1 Z1 F300"));
+      }
+      else {
+        if (all_axes_trusted() && current_position.z == 1 && !stepper.axis_is_moving(Z_AXIS)) {
+          uiCfg.leveling_first_time = 1;
+        }
+      }
+    }
+  }
+}
+
 void auto_leveling_dialog_handle() {
   if (DIALOG_IS(AUTO_LEVELING) && level_state == LEVEL_STATE_NULL) {
     uiCfg.dialogType = DIALOG_AUTO_LEVEL_HOMING;
@@ -983,7 +1017,7 @@ void auto_leveling_dialog_handle() {
         uiCfg.leveling_first_time = 0;
         if (!all_axes_trusted()) queue.enqueue_now_P(PSTR("G28"));
         queue.enqueue_now_P(PSTR("G1 X150 Y150 F3000"));
-        queue.enqueue_now_P(PSTR("G1 Z0 F600"));
+        queue.enqueue_now_P(PSTR("G1 Z0 F300"));
       }
       else {
         if (all_axes_trusted() && current_position.z == 0) {

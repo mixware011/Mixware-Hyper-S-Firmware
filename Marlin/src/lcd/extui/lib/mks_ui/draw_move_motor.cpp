@@ -165,7 +165,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
             break;
           case Z_AXIS:
             if ((cur_pos = current_position.z + uiCfg.move_dist) > Z_MAX_POS) cur_pos = Z_MAX_POS;
-            sprintf_P(public_buf_l, PSTR("G1 Z%3.1f F%d"), cur_pos, uiCfg.moveSpeed);
+            sprintf_P(public_buf_l, PSTR("G1 Z%3.1f F%d"), cur_pos, uiCfg.moveSpeed / 10);
             break;
           default: break;
         }
@@ -185,7 +185,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
             break;
           case Z_AXIS:
             if ((cur_pos = current_position.z - uiCfg.move_dist) < Z_MIN_POS) cur_pos = Z_MIN_POS;
-            sprintf_P(public_buf_l, PSTR("G1 Z%3.1f F%d"), cur_pos, uiCfg.moveSpeed);
+            sprintf_P(public_buf_l, PSTR("G1 Z%3.1f F%d"), cur_pos, uiCfg.moveSpeed / 10);
             break;
         }
         queue.enqueue_one_now(public_buf_l);

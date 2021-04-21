@@ -451,6 +451,8 @@ typedef struct set_menu_disp {
   const char *machine_para;
   const char *eepromSet;
   const char *back;
+  TERN_(MIXWARE_MODEL_V, const char *axisztest;)
+  TERN_(MIXWARE_MODEL_V, const char *axisztesting;)
 } set_menu_def;
 
 extern set_menu_def set_menu;

@@ -524,6 +524,7 @@ extern keyboard_value_state keyboard_value;
   } mixware_level_state;
   extern mixware_level_state level_state;
 
+  extern bool axis_z_test_start_flag;
   extern bool level_update_flag;
   extern bool offset_save_flag;
   extern lv_point_t button_pixel_point[6];

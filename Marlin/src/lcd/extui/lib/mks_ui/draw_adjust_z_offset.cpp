@@ -61,7 +61,7 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
         else {
           ZERO(public_buf_l);
           queue.enqueue_one_P(PSTR("G91"));
-          sprintf_P(public_buf_l, PSTR("G1 Z%3.1f F%d"), uiCfg.move_dist, uiCfg.moveSpeed);
+          sprintf_P(public_buf_l, PSTR("G1 Z%3.1f F300"), uiCfg.move_dist);
           queue.enqueue_one_now(public_buf_l);
           queue.enqueue_one_P(PSTR("G90"));
           probe.offset.z += uiCfg.move_dist;
@@ -80,7 +80,7 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
         else {
           ZERO(public_buf_l);
           queue.enqueue_one_P(PSTR("G91"));
-          sprintf_P(public_buf_l, PSTR("G1 Z-%3.1f F%d"), uiCfg.move_dist, uiCfg.moveSpeed);
+          sprintf_P(public_buf_l, PSTR("G1 Z-%3.1f F300"), uiCfg.move_dist);
           queue.enqueue_one_now(public_buf_l);
           queue.enqueue_one_P(PSTR("G90"));
           probe.offset.z -= uiCfg.move_dist;
@@ -104,7 +104,7 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
       if (!offset_save_flag)
         probe.offset.z = z_offset_bak;
 
-      queue.inject_P(PSTR("G91\nG1 Z10 F2000\nG90\nM84"));
+      queue.inject_P(PSTR("G91\nG1 Z10 F300\nG90\nM84"));
       lv_clear_cur_ui();
       lv_draw_level_select();
       break;

@@ -2899,6 +2899,8 @@ void disp_language_init() {
     filament_temp_select.temp_260                   = TEMP_260;
     filament_temp_select.temp_270                   = TEMP_270;
 
+    set_menu.axisztest                              = AXIS_TEST_Z_EN;
+    set_menu.axisztesting                           = AXIS_TESTING_Z_EN;
     switch (gCfgItems.language) {
       case LANG_SIMPLE_CHINESE:
         adjust_z_menu.title                         = OFFSET_Z_CN;
@@ -2922,6 +2924,8 @@ void disp_language_init() {
         machine_menu.FilamentConfTitle              = FILAMENT_DIALOG_BREAK_TITLE_CN;
         machine_menu.FilamentDetPausing             = FILAMENT_DIALOG_BREAKING_CN;
         filament_temp_select.title                  = PRINTING_TEMP_CN;
+        set_menu.axisztest                          = AXIS_TEST_Z_CN;
+        set_menu.axisztesting                       = AXIS_TESTING_Z_CN;
         break;
       case LANG_COMPLEX_CHINESE:
         adjust_z_menu.title                         = OFFSET_Z_T_CN;
@@ -2945,6 +2949,8 @@ void disp_language_init() {
         machine_menu.FilamentConfTitle              = FILAMENT_DIALOG_BREAK_TITLE_T_CN;
         machine_menu.FilamentDetPausing             = FILAMENT_DIALOG_BREAKING_T_CN;
         filament_temp_select.title                  = PRINTING_TEMP_T_CN;
+        set_menu.axisztest                          = AXIS_TEST_Z_T_CN;
+        set_menu.axisztesting                       = AXIS_TESTING_Z_T_CN;
         break;
       case LANG_RUSSIAN:
         adjust_z_menu.title                         = OFFSET_Z_RU;
@@ -3040,6 +3046,8 @@ void disp_language_init() {
         home_menu.motor_off                         = MOTOR_OFF_TEXT_EN;
         leveling_menu.z_offset                      = OFFSET_Z_EN;
         filament_temp_select.title                  = PRINTING_TEMP_EN;
+        set_menu.axisztest                          = AXIS_TEST_Z_EN;
+        set_menu.axisztesting                       = AXIS_TESTING_Z_EN;
         break;
     }
   #endif
