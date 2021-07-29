@@ -204,7 +204,7 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       lv_clear_cur_ui();
       if (uiCfg.print_state == IDLE) {
         lv_draw_tool();
-      }else {
+      } else {
         lv_draw_operation();
       }
       break;

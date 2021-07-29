@@ -125,8 +125,12 @@
 
 // SD card information first addr
 #define VAR_INF_ADDR                    0x000000
-#define FLASH_INF_VALID_FLAG            0x20201118
-
+#define FLASH_INF_VALID_FLAG            0x20210726
+#if (FLASH_INF_VALID_FLAG >= 0x20210629)
+  #define MIXWARE_UI_SELECT(a, b) gCfgItems.filament_max_temper < 300 ? a : b
+#else
+  #define MIXWARE_UI_SELECT(a, b) a
+#endif
 //Store some gcode commands, such as auto leveling commands
 #define GCODE_COMMAND_ADDR              VAR_INF_ADDR + 3*1024
 #define AUTO_LEVELING_COMMAND_ADDR      GCODE_COMMAND_ADDR

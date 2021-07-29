@@ -91,7 +91,11 @@ void lv_draw_level_select(void) {
   scr = lv_screen_create(LEVEL_SELECT_UI);
 
   if (uiCfg.para_ui_page == 0) {
-    lv_big_button_create(scr, "F:/img_level2.bin", tool_menu.leveling,  button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_LEVEL_SELECT_MAIN);
+    if (READ(Z2_MIN_PIN) == false)
+      lv_big_button_create(scr, "F:/img_level2.bin", tool_menu.leveling,  button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_LEVEL_SELECT_MAIN);
+    else
+      lv_big_button_create(scr, "F:/img_level_manual.bin", leveling_menu.title,    button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_LEVEL_SELECT_MANUAL);
+
     lv_big_button_create(scr, "F:/img_level_z_offset.bin", leveling_menu.z_offset,  button_pixel_point[3].x, button_pixel_point[3].y, event_handler, ID_LEVEL_SELECT_HEIGHT);
   }
   else {

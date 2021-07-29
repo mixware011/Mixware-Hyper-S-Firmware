@@ -184,7 +184,7 @@ static void disp_language(uint8_t language, uint8_t state) {
 }
 
 void lv_draw_language(void) {
-  scr = lv_screen_create(LANGUAGE_UI);
+  scr = lv_screen_create(LANGUAGE_UI, language_menu.title);
   // Create image buttons
 #if ENABLED(MIXWARE_MODEL_V)
   buttonCN   = lv_big_button_create(scr, "F:/img_language_zh_CN.bin", language_menu.chinese_s, button_pixel_point[0].x, button_pixel_point[0].y, event_handler, ID_CN);

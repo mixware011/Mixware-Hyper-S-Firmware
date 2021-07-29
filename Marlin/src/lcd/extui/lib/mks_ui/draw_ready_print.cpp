@@ -33,6 +33,7 @@
 #include <lvgl.h>
 
 #include "../../../../module/temperature.h"
+#include "../../../../sd/cardreader.h"
 #include "../../../../inc/MarlinConfig.h"
 
 #if ENABLED(TOUCH_SCREEN_CALIBRATION)
@@ -49,6 +50,7 @@ static lv_obj_t *scr;
 #endif
 #if ENABLED(MIXWARE_MODEL_V)
   static lv_obj_t *label_R_Ext, *label_R_Bed;
+        lv_style_t style_para;
 #endif
 
 enum {
@@ -68,7 +70,16 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       lv_draw_set();
       break;
     case ID_PRINT:
-      lv_draw_print_file();
+      #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+        card.mount();
+
+        if (card.isMounted())
+          lv_draw_print_file();
+        else
+          lv_draw_dialog(DIALOG_TYPE_REPRINT_NO_FILE);
+      #else
+        lv_draw_print_file();
+      #endif
       break;
   }
 }
@@ -200,12 +211,35 @@ void lv_draw_ready_print(void) {
   }
   else {
     #if ENABLED(MIXWARE_MODEL_V)
+      if (gCfgItems.filament_max_temper > 300) {
+        // lv_obj_t *mode = lv_label_create(scr, filament_temp_select.temp_mode_tips);
+        // lv_obj_align(mode, nullptr, LV_ALIGN_CENTER, 0, -86);
+        lv_style_copy(&style_para, &lv_style_plain);
+        style_para.body.border.color = LV_COLOR_BACKGROUND;
+        style_para.body.border.width = 1;
+        style_para.body.main_color   = LV_COLOR_BACKGROUND;
+        style_para.body.grad_color   = LV_COLOR_BACKGROUND;
+        style_para.body.shadow.width = 0;
+        style_para.body.radius       = 3;
+        style_para.body.border.color = TFT_LV_PARA_BACK_BODY_COLOR;
+        style_para.body.border.width = 2;
+        style_para.text.color        = LV_COLOR_WHITE;
+        style_para.text.font         = &TERN(HAS_SPI_FLASH_FONT, gb2312_puhui32, lv_font_roboto_22);
+
+        lv_obj_t* btn = lv_btn_create(scr, nullptr);
+        lv_obj_t* label = lv_label_create(btn, filament_temp_select.temp_mode_tips, true);
+        lv_btn_set_style_both(btn, &style_para);
+        lv_obj_set_size(btn, 240, 36);
+        lv_obj_align(label, btn, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_align(btn, nullptr, LV_ALIGN_CENTER, 0, -78);
+      }
+
       lv_big_button_create(scr, "F:/img_tool.bin",     main_menu.tool,  28,  340, event_handler, ID_TOOL);
       lv_big_button_create(scr, "F:/img_set.bin",      main_menu.set,   173, 340, event_handler, ID_SET);
-      lv_big_button_create(scr, "F:/img_printing.bin", main_menu.print, 101, 198, event_handler, ID_PRINT);
+      lv_big_button_create(scr, (gCfgItems.filament_max_temper < 300 ? "F:/img_printing.bin" : "F:/HI_printing.bin"), main_menu.print, 101, 198, event_handler, ID_PRINT);
 
       lv_obj_t *buttonExt = lv_img_create(scr, nullptr);
-      lv_img_set_src(buttonExt, "F:/bmp_ext2_state.bin");
+      lv_img_set_src(buttonExt, (gCfgItems.filament_max_temper < 300 ? "F:/bmp_ext_state.bin" : "F:/HI_ext_state.bin"));
       lv_obj_set_pos(buttonExt, 45, 82);
       label_R_Ext = lv_label_create(scr, 90, 92, nullptr);
 

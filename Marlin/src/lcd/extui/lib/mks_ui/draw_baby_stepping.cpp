@@ -72,49 +72,48 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
   char str_1[16];
   switch (obj->mks_obj_id) {
     case ID_BABY_STEP_X_P:
-      sprintf_P(baby_buf, PSTR("M290 X%s"), dtostrf(babystep_dist, 1, 3, str_1));
+      sprintf_P(baby_buf, PSTR("M290 X%s"), dtostrf(babystep_dist, 1, 2, str_1));
       gcode.process_subcommands_now_P(PSTR(baby_buf));
       has_adjust_z = 1;
       break;
     case ID_BABY_STEP_X_N:
-      sprintf_P(baby_buf, PSTR("M290 X%s"), dtostrf(-babystep_dist, 1, 3, str_1));
+      sprintf_P(baby_buf, PSTR("M290 X%s"), dtostrf(-babystep_dist, 1, 2, str_1));
       gcode.process_subcommands_now_P(PSTR(baby_buf));
       has_adjust_z = 1;
       break;
     case ID_BABY_STEP_Y_P:
-      sprintf_P(baby_buf, PSTR("M290 Y%s"), dtostrf(babystep_dist, 1, 3, str_1));
+      sprintf_P(baby_buf, PSTR("M290 Y%s"), dtostrf(babystep_dist, 1, 2, str_1));
       gcode.process_subcommands_now_P(PSTR(baby_buf));
       has_adjust_z = 1;
       break;
     case ID_BABY_STEP_Y_N:
-      sprintf_P(baby_buf, PSTR("M290 Y%s"), dtostrf(-babystep_dist, 1, 3, str_1));
+      sprintf_P(baby_buf, PSTR("M290 Y%s"), dtostrf(-babystep_dist, 1, 2, str_1));
       gcode.process_subcommands_now_P(PSTR(baby_buf));
       has_adjust_z = 1;
       break;
     case ID_BABY_STEP_Z_P:
-      sprintf_P(baby_buf, PSTR("M290 Z%s"), dtostrf(babystep_dist, 1, 3, str_1));
+      sprintf_P(baby_buf, PSTR("M290 Z%s"), dtostrf(babystep_dist, 1, 2, str_1));
       gcode.process_subcommands_now_P(PSTR(baby_buf));
       has_adjust_z = 1;
       break;
     case ID_BABY_STEP_Z_N:
-      sprintf_P(baby_buf, PSTR("M290 Z%s"), dtostrf(-babystep_dist, 1, 3, str_1));
+      sprintf_P(baby_buf, PSTR("M290 Z%s"), dtostrf(-babystep_dist, 1, 2, str_1));
       gcode.process_subcommands_now_P(PSTR(baby_buf));
       has_adjust_z = 1;
       break;
     case ID_BABY_STEP_DIST:
-      if (abs((int)(100 * babystep_dist)) == 1)
+      if (abs((int)(100 * babystep_dist)) == 10)
         babystep_dist = 0.05;
       else if (abs((int)(100 * babystep_dist)) == 5)
         babystep_dist = 0.1;
-      else
-        babystep_dist = 0.01;
+
       disp_baby_step_dist();
       break;
     case ID_BABY_STEP_RETURN:
-      if (has_adjust_z == 1) {
-        TERN_(EEPROM_SETTINGS, (void)settings.save());
-        has_adjust_z = 0;
-      }
+      // if (has_adjust_z == 1) {
+      //   TERN_(EEPROM_SETTINGS, (void)settings.save());
+      //   has_adjust_z = 0;
+      // }
       lv_clear_cur_ui();
       lv_draw_return_ui();
       break;
@@ -129,18 +128,18 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       break;
     case ID_BABY_STEP_ADD:
         switch (uiCfg.move_axis) {
-          case X_AXIS: sprintf_P(baby_buf, PSTR("M290 X%s"), dtostrf(babystep_dist, 1, 3, str_1)); break;
-          case Y_AXIS: sprintf_P(baby_buf, PSTR("M290 Y%s"), dtostrf(babystep_dist, 1, 3, str_1)); break;
-          case Z_AXIS: sprintf_P(baby_buf, PSTR("M290 Z%s"), dtostrf(babystep_dist, 1, 3, str_1)); break;
+          case X_AXIS: sprintf_P(baby_buf, PSTR("M290 X%s"), dtostrf(babystep_dist, 1, 2, str_1)); break;
+          case Y_AXIS: sprintf_P(baby_buf, PSTR("M290 Y%s"), dtostrf(babystep_dist, 1, 2, str_1)); break;
+          case Z_AXIS: sprintf_P(baby_buf, PSTR("M290 Z%s"), dtostrf(babystep_dist, 1, 2, str_1)); break;
           default: break;
         }
         gcode.process_subcommands_now_P(PSTR(baby_buf));
       break;
     case ID_BABY_STEP_DEC:
         switch (uiCfg.move_axis) {
-          case X_AXIS: sprintf_P(baby_buf, PSTR("M290 X%s"), dtostrf(-babystep_dist, 1, 3, str_1)); break;
-          case Y_AXIS: sprintf_P(baby_buf, PSTR("M290 Y%s"), dtostrf(-babystep_dist, 1, 3, str_1)); break;
-          case Z_AXIS: sprintf_P(baby_buf, PSTR("M290 Z%s"), dtostrf(-babystep_dist, 1, 3, str_1)); break;
+          case X_AXIS: sprintf_P(baby_buf, PSTR("M290 X%s"), dtostrf(-babystep_dist, 1, 2, str_1)); break;
+          case Y_AXIS: sprintf_P(baby_buf, PSTR("M290 Y%s"), dtostrf(-babystep_dist, 1, 2, str_1)); break;
+          case Z_AXIS: sprintf_P(baby_buf, PSTR("M290 Z%s"), dtostrf(-babystep_dist, 1, 2, str_1)); break;
           default: break;
         }
         gcode.process_subcommands_now_P(PSTR(baby_buf));
@@ -153,6 +152,7 @@ void lv_draw_baby_stepping(void) {
   scr = lv_screen_create(BABY_STEP_UI);
 
   #if ENABLED(MIXWARE_MODEL_V)
+    babystep_dist = 0.1;
     buttonAxis = lv_imgbtn_create(scr, nullptr, button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_BABY_STEP_AXIS);
     buttonV    = lv_imgbtn_create(scr, nullptr, button_pixel_point[3].x, button_pixel_point[3].y, event_handler, ID_BABY_STEP_DIST);
     #if HAS_ROTARY_ENCODER
@@ -177,6 +177,11 @@ void lv_draw_baby_stepping(void) {
     disp_baby_step_axis();
     disp_baby_step_dist();
     disp_z_offset_value();
+
+      lv_obj_t *l_tips_axis = lv_label_create(buttonAxis, machine_menu.ButtonTips);
+      lv_obj_align(l_tips_axis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, 2);
+      lv_obj_t *l_tips_v = lv_label_create(buttonV, machine_menu.ButtonTips);
+      lv_obj_align(l_tips_v, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, 2);
   #else
     lv_big_button_create(scr, "F:/bmp_xAdd.bin", move_menu.x_add, INTERVAL_V, titleHeight, event_handler, ID_BABY_STEP_X_P);
     lv_big_button_create(scr, "F:/bmp_xDec.bin", move_menu.x_dec, INTERVAL_V, BTN_Y_PIXEL + INTERVAL_H + titleHeight, event_handler, ID_BABY_STEP_X_N);
@@ -202,32 +207,27 @@ void lv_draw_baby_stepping(void) {
 }
 
 void disp_baby_step_dist() {
-  if ((int)(100 * babystep_dist) == 1)
-    lv_imgbtn_set_src_both(buttonV, TERN(MIXWARE_MODEL_V, "F:/img_step_mm_1.bin", "F:/bmp_baby_move0_01.bin"));
-  else if ((int)(100 * babystep_dist) == 5)
-    lv_imgbtn_set_src_both(buttonV, TERN(MIXWARE_MODEL_V, "F:/img_step_mm_5.bin", "F:/bmp_baby_move0_05.bin"));
+  if ((int)(100 * babystep_dist) == 5)
+    lv_imgbtn_set_src_both(buttonV, TERN(MIXWARE_MODEL_V, "F:/img_step_mm_1.bin", "F:/bmp_baby_move0_05.bin"));
   else if ((int)(100 * babystep_dist) == 10)
     lv_imgbtn_set_src_both(buttonV, TERN(MIXWARE_MODEL_V, "F:/img_step_mm_10.bin", "F:/bmp_baby_move0_1.bin"));
 
   if (gCfgItems.multiple_language) {
-    if ((int)(100 * babystep_dist) == 1) {
-      lv_label_set_text(labelV, move_menu.step_001mm);
-      lv_obj_align(labelV, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
-    }
-    else if ((int)(100 * babystep_dist) == 5) {
+    if ((int)(100 * babystep_dist) == 5) {
       lv_label_set_text(labelV, move_menu.step_005mm);
-      lv_obj_align(labelV, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+      lv_obj_align(labelV, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
     else if ((int)(100 * babystep_dist) == 10) {
       lv_label_set_text(labelV, move_menu.step_01mm);
-      lv_obj_align(labelV, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+      lv_obj_align(labelV, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
   }
 }
 
 void disp_z_offset_value() {
   #if ENABLED(MIXWARE_MODEL_V)
-    sprintf_P(public_buf_l, PSTR("%.2f"), probe.offset.z);
+    char str_1[16];
+    sprintf_P(public_buf_l, PSTR("%s mm"), dtostrf(probe.offset[Z_AXIS], 1, 2, str_1));
     if (zOffsetText)lv_label_set_text(zOffsetText, public_buf_l);
   #else
     char buf[20];
@@ -253,21 +253,21 @@ void disp_baby_step_axis() {
       lv_imgbtn_set_src_both(buttonAxis, "F:/img_axis_x.bin");
       if (gCfgItems.multiple_language) {
         lv_label_set_text(labelAxis, move_menu.x_axis);
-        lv_obj_align(labelAxis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+        lv_obj_align(labelAxis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
       }
     break;
     case Y_AXIS:
       lv_imgbtn_set_src_both(buttonAxis, "F:/img_axis_y.bin");
       if (gCfgItems.multiple_language) {
         lv_label_set_text(labelAxis, move_menu.y_axis);
-        lv_obj_align(labelAxis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+        lv_obj_align(labelAxis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
       }
     break;
     case Z_AXIS:
       lv_imgbtn_set_src_both(buttonAxis, "F:/img_axis_z.bin");
       if (gCfgItems.multiple_language) {
         lv_label_set_text(labelAxis, move_menu.z_axis);
-        lv_obj_align(labelAxis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+        lv_obj_align(labelAxis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
       }
     break;
   }

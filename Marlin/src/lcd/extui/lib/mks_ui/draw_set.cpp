@@ -59,7 +59,7 @@ enum {
   ID_S_RETURN
   #if ENABLED(MIXWARE_MODEL_V)
   ,ID_S_FILAMENT_DET
-  ,ID_S_Z_AXIS_TEST
+  ,ID_S_DEBUG
   #endif
 };
 
@@ -133,9 +133,8 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
         lv_obj_refresh_ext_draw_pad(labelFilamentDet);
         update_spi_flash();
         break;
-      case ID_S_Z_AXIS_TEST:
-        uiCfg.leveling_first_time = 1;
-        lv_draw_dialog(DIALOG_AXIS_Z_TEST);
+      case ID_S_DEBUG:
+        lv_draw_debug_selfc();
         break;
     #endif
   }
@@ -157,7 +156,7 @@ void lv_draw_set(void) {
   lv_label_set_text(labelFilamentDet, gCfgItems.filament_det_enable ? operation_menu.filament_sensor_on : operation_menu.filament_sensor_off);
   lv_obj_align(labelFilamentDet, buttonFilamentDet, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
 
-  lv_big_button_create(scr, "F:/img_axis_z_test.bin", set_menu.axisztest, button_pixel_point[5].x, button_pixel_point[5].y, event_handler, ID_S_Z_AXIS_TEST);
+  lv_big_button_create(scr, "F:/img_self_check.bin", debug_menu.selfc_title, button_pixel_point[5].x, button_pixel_point[5].y, event_handler, ID_S_DEBUG);
   #if HAS_ROTARY_ENCODER
     if (gCfgItems.encoder_enable) lv_group_add_obj(g, buttonPowerOff);
   #endif

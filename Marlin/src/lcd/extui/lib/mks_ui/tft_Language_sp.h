@@ -227,7 +227,7 @@
 #define DIALOG_RETRY_SP             "Reintentar"
 #define DIALOG_STOP_SP              "Stop"
 #define DIALOG_REPRINT_FROM_BREAKPOINT_SP "Reprint from breakpoint?"
-#define DIALOG_ERROR_TIPS1_SP         "Error:archivo no encontrado, \npor favor insertar SD o disco USB."
+#define DIALOG_ERROR_TIPS1_SP         "Error:archivo no encontrado, \npor favor insertar USB."
 #define DIALOG_ERROR_TIPS2_SP         "error:transacción fallida, \nconfigurar  baudrate del \ndisplay para la placa base!"
 #define DIALOG_ERROR_TIPS3_SP         "Error : nombre de archivo o \nruta demasiado largo!"
 #define DIALOG_CLOSE_MACHINE_SP       "Closing machine......"

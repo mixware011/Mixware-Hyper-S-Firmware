@@ -164,8 +164,9 @@ void gCfgItems_init() {
   gCfgItems.filamentchange_load_length   = TERN(MIXWARE_MODEL_V, 100,  200);
   gCfgItems.filamentchange_load_speed    = TERN(MIXWARE_MODEL_V, 300, 1000);
   gCfgItems.filamentchange_unload_length = TERN(MIXWARE_MODEL_V,  80,  200);
-  gCfgItems.filamentchange_unload_speed  = TERN(MIXWARE_MODEL_V, 300, 1000);
+  gCfgItems.filamentchange_unload_speed  = TERN(MIXWARE_MODEL_V, 1200, 1000);
   gCfgItems.filament_limit_temper        = 200;
+  gCfgItems.filament_max_temper          = 260;
 
   gCfgItems.encoder_enable = true;
   TERN_(MIXWARE_MODEL_V, gCfgItems.filament_det_enable = false);
@@ -292,6 +293,7 @@ void get_gcode_command(int addr,uint8_t *d) {
 lv_style_t tft_style_scr;
 lv_style_t tft_style_label_pre;
 lv_style_t tft_style_label_rel;
+lv_style_t tft_style_label_HT;
 lv_style_t style_line;
 lv_style_t style_para_value_pre;
 lv_style_t style_para_value_rel;
@@ -304,6 +306,7 @@ lv_style_t style_sel_text;
 
 lv_style_t style_para_value;
 lv_style_t style_para_back;
+lv_style_t style_para_button;
 
 lv_style_t lv_bar_style_indic;
 
@@ -338,6 +341,10 @@ void tft_style_init() {
   tft_style_label_rel.text.letter_space = 0;
   tft_style_label_pre.text.line_space   = 0;
   tft_style_label_rel.text.line_space   = 0;
+
+  lv_style_copy(&tft_style_label_HT, &tft_style_label_rel);
+  tft_style_label_HT.text.color      = TFT_LV_PARA_BACK_BODY_COLOR;
+  tft_style_label_HT.text.sel_color  = TFT_LV_PARA_BACK_BODY_COLOR;
 
   lv_style_copy(&style_para_value_pre, &lv_style_scr);
   lv_style_copy(&style_para_value_rel, &lv_style_scr);
@@ -426,6 +433,18 @@ void tft_style_init() {
   style_para_back.text.color        = LV_COLOR_WHITE;
   style_para_back.text.font         = &TERN(HAS_SPI_FLASH_FONT, gb2312_puhui32, lv_font_roboto_22);
 
+  lv_style_copy(&style_para_button, &lv_style_plain);
+  style_para_button.body.border.color = LV_COLOR_BACKGROUND;
+  style_para_button.body.border.width = 1;
+  style_para_button.body.main_color   = LV_COLOR_BACKGROUND;
+  style_para_button.body.grad_color   = LV_COLOR_BACKGROUND;
+  style_para_button.body.shadow.width = 0;
+  style_para_button.body.radius       = 3;
+  style_para_button.body.border.color = TFT_LV_PARA_BACK_BODY_COLOR;
+  style_para_button.body.border.width = 4;
+  style_para_button.text.color        = LV_COLOR_WHITE;
+  style_para_button.text.font         = &TERN(HAS_SPI_FLASH_FONT, gb2312_puhui32, lv_font_roboto_22);
+
   lv_style_copy(&style_btn_rel, &lv_style_plain);
   style_btn_rel.body.border.color = TERN(MIXWARE_MODEL_V, LV_COLOR_BACKGROUND, lv_color_hex3(0x269));
   style_btn_rel.body.border.width = 1;
@@ -454,7 +473,7 @@ void tft_style_init() {
   lv_bar_style_indic.body.border.color = lv_color_hex3(0xADF);
 }
 
-#define MAX_TITLE_LEN 28
+#define MAX_TITLE_LEN 25
 
 char public_buf_m[100] = {0};
 char public_buf_l[30];
@@ -557,9 +576,21 @@ char *getDispText(int index) {
         break;
       case ADJUST_Z_OFFSET_UI:
         strcpy(public_buf_l, adjust_z_menu.title);
+        break;
       case LEVEL_SELECT_UI:
         strcpy(public_buf_l, tool_menu.leveling);
-      break;
+        break;
+      #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+        case PIDTEMP_SW_UI:
+          strcpy(public_buf_l, pidtemp_sw_menu.title);
+          break;
+        case DEBUG_ZAXIS_UI:
+          strcpy(public_buf_l, debug_menu.zaxis_title);
+          break;
+        case DEBUG_SELFC_UI:
+          strcpy(public_buf_l, debug_menu.selfc_title);
+          break;
+      #endif
     #endif
     case LEVELING_UI:
     case MESHLEVELING_UI:
@@ -754,7 +785,6 @@ char *creat_title_text() {
           card.startFileprint();
           TERN_(POWER_LOSS_RECOVERY, recovery.prepare());
           once_flag = false;
-          SERIAL_ECHOPAIR("\r\n ???????????????????????????: ");
         }
         return;
       }
@@ -988,6 +1018,12 @@ void GUI_RefreshPage() {
         disp_z_offset_value();
       }
       break;
+    case DEBUG_SELFC_UI:
+      if (temps_update_flag) {
+        temps_update_flag = false;
+        dis_cur_debug();
+      }
+      break;
     default: break;
   }
 
@@ -1093,6 +1129,11 @@ void lv_clear_cur_ui() {
       case ADJUST_Z_OFFSET_UI:        lv_clear_adjust_z_offset(); break;
       case LEVEL_SELECT_UI:           lv_clear_level_select(); break;
       case FILAMENT_TEMPERATURE_SELECT_UI: lv_clear_filament_temperature_select(); break;
+      #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+        case PIDTEMP_SW_UI: lv_clear_pidtemp_switch(); break;
+        case DEBUG_ZAXIS_UI: lv_clear_debug_zaxis(); break;
+        case DEBUG_SELFC_UI: lv_clear_debug_selfc(); break;
+      #endif
     #endif
     default: break;
   }
@@ -1201,6 +1242,11 @@ void lv_draw_return_ui() {
       #if ENABLED(MIXWARE_MODEL_V)
         case ADJUST_Z_OFFSET_UI:        lv_draw_adjust_z_offset(); break;
         case LEVEL_SELECT_UI:           lv_draw_level_select(); break;
+        #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+        case PIDTEMP_SW_UI: lv_draw_pidtemp_switch(); break;
+        case DEBUG_ZAXIS_UI: lv_draw_debug_zaxis(); break;
+        case DEBUG_SELFC_UI: lv_draw_debug_selfc(); break;
+        #endif
       #endif
       default: break;
     }
@@ -1260,6 +1306,11 @@ lv_obj_t* lv_screen_create(DISP_STATE newScreenType, const char* title) {
   if (titleLabel)
     lv_obj_set_style(titleLabel, &tft_style_label_rel);
 
+  if (gCfgItems.filament_max_temper > 300 && newScreenType != PRINT_READY_UI && newScreenType != PRINTING_UI) {
+    lv_obj_t *mode = lv_label_create(scr, filament_temp_select.temp_mode, true);
+    lv_obj_align(mode, nullptr, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
+  }
+
   lv_refr_now(lv_refr_get_disp_refreshing());
 
   return scr;
@@ -1277,6 +1328,16 @@ lv_obj_t* lv_label_create(lv_obj_t *par, const char *text) {
   if (text) lv_label_set_text(label, text);
   lv_obj_set_style(label, &tft_style_label_rel);
   return label;
+}
+
+// Create a label with style and text
+lv_obj_t* lv_label_create(lv_obj_t *par, const char *text, const bool is/*=false*/) {
+  if (is) {
+    lv_obj_t *label = lv_label_create_empty(par);
+    if (text) lv_label_set_text(label, text);
+    lv_obj_set_style(label, &tft_style_label_HT);
+    return label;
+  }
 }
 
 // Create a label with style, position, and text
@@ -1408,6 +1469,18 @@ lv_obj_t* lv_screen_menu_item(lv_obj_t *par, const char *text, lv_coord_t x, lv_
 
   lv_obj_t *line1 = lv_line_create(par, nullptr);
   lv_ex_line(line1, line_points[index]);
+
+  return btn;
+}
+
+lv_obj_t* lv_screen_menu_item(lv_obj_t *par, const char *text, lv_coord_t x, lv_coord_t y, lv_event_cb_t cb, const int id) {
+  lv_obj_t* btn = lv_btn_create(par, x, y, 145, 67, cb, id);
+  lv_obj_t* label = lv_label_create_empty(btn);
+  lv_btn_set_style_both(btn, &style_para_button);
+  lv_label_set_text(label, text);
+  lv_obj_align(label, btn, LV_ALIGN_CENTER, 0, 0);
+  if (TERN0(HAS_ROTARY_ENCODER, gCfgItems.encoder_enable))
+    lv_group_add_obj(g, btn);
 
   return btn;
 }

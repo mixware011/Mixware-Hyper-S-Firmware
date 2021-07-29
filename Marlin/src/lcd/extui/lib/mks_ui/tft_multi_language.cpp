@@ -63,6 +63,10 @@ eeprom_def                   eeprom_menu;
   adjust_z_menu_def   adjust_z_menu;
   autolevel_menu_def  autolevel_menu;
   filament_temp_select_def filament_temp_select;
+  #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+    pidtemp_sw_menu_def pidtemp_sw_menu;
+    debug_menu_def debug_menu;
+  #endif
 #endif
 
 machine_common_def machine_menu;
@@ -763,12 +767,15 @@ void machine_setting_disp() {
   #if ENABLED(MIXWARE_MODEL_V)
     if (gCfgItems.language == LANG_SIMPLE_CHINESE) {
       machine_menu.RunoutConfText = RUNOUT_CONF_TEXT_CN;
+      machine_menu.ButtonTips = MENU_BUTTON_TIPS_CN;
     }
     else if (gCfgItems.language == LANG_COMPLEX_CHINESE) {
       machine_menu.RunoutConfText = RUNOUT_CONF_TEXT_T_CN;
+      machine_menu.ButtonTips = MENU_BUTTON_TIPS_T_CN;
     }
     else {
       machine_menu.RunoutConfText = RUNOUT_CONF_TEXT_EN;
+      machine_menu.ButtonTips = MENU_BUTTON_TIPS_EN;
     }
   #endif
 }
@@ -2887,9 +2894,11 @@ void disp_language_init() {
     move_menu.z_axis                                = HOME_Z_TEXT;
     operation_menu.filament_sensor_on               = FILAMENT_SENSOR_ON_EN;
     operation_menu.filament_sensor_off              = FILAMENT_SENSOR_OFF_EN;
-    machine_menu.FilamentConfTitle                  = FILAMENT_DIALOG_BREAK_TITLE_EN;
     machine_menu.FilamentDetPausing                 = FILAMENT_DIALOG_BREAKING_EN;
 
+    filament_temp_select.temp_170                   = TEMP_170;
+    filament_temp_select.temp_180                   = TEMP_180;
+    filament_temp_select.temp_190                   = TEMP_190;
     filament_temp_select.temp_200                   = TEMP_200;
     filament_temp_select.temp_210                   = TEMP_210;
     filament_temp_select.temp_220                   = TEMP_220;
@@ -2898,9 +2907,45 @@ void disp_language_init() {
     filament_temp_select.temp_250                   = TEMP_250;
     filament_temp_select.temp_260                   = TEMP_260;
     filament_temp_select.temp_270                   = TEMP_270;
+    filament_temp_select.temp_280                   = TEMP_280;
+    filament_temp_select.temp_290                   = TEMP_290;
+    filament_temp_select.temp_300                   = TEMP_300;
+    filament_temp_select.temp_310                   = TEMP_310;
+    filament_temp_select.temp_320                   = TEMP_320;
+    filament_temp_select.temp_330                   = TEMP_330;
+    filament_temp_select.temp_340                   = TEMP_340;
+    filament_temp_select.temp_350                   = TEMP_350;
 
     set_menu.axisztest                              = AXIS_TEST_Z_EN;
     set_menu.axisztesting                           = AXIS_TESTING_Z_EN;
+
+    #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+      machine_menu.PIDTempConf                      = PIDTEMP_SW_TITLE_EN;
+      pidtemp_sw_menu.title                         = PIDTEMP_SW_TITLE_EN;
+      pidtemp_sw_menu.normal                        = PIDTEMP_SW_NMODEL_EN;
+      pidtemp_sw_menu.high                          = PIDTEMP_SW_HMODEL_EN;
+      pidtemp_sw_menu.n_model                       = PIDTEMP_SW_NMODEL_CUR_EN;
+      pidtemp_sw_menu.h_model                       = PIDTEMP_SW_HMODEL_CUR_EN;
+      pidtemp_sw_menu.normal_confirm                = PIDTEMP_SW_NMODEL_TIP_EN;
+      pidtemp_sw_menu.high_confirm                  = PIDTEMP_SW_HMODEL_TIP_EN;
+      filament_temp_select.temp_mode                = HIGH_HEAT_MODE_EN;
+      filament_temp_select.temp_mode_tips           = HIGH_HEAT_MODE_TIPS_EN;
+      filament_temp_select.temp_adjust              = FILAMENT_ADJUST_TEMP_EN;
+      debug_menu.zaxis_title                        = AXIS_TEST_Z_EN;
+      debug_menu.selfc_title                        = DEBUG_SELF_CHECK_TITLE_EN;
+      debug_menu.selfc_confirm                      = DEBUG_SELF_CHECK_CONFIRM_EN;
+      debug_menu.selfc_checking                     = DEBUG_SELF_CHECK_CHECKING_EN;
+      debug_menu.zaxis_slow                         = DEBUG_SELF_CHECK_AXIS_SLOW_EN;
+      debug_menu.zaxis_fast                         = DEBUG_SELF_CHECK_AXIS_FAST_EN;
+      debug_menu.selfc_tips_etemp                   = DEBUG_SELF_CHECK_TIPS_E_TEMP_EN;
+      debug_menu.selfc_tips_btemp                   = DEBUG_SELF_CHECK_TIPS_B_TEMP_EN;
+      debug_menu.selfc_tips_eheat                   = DEBUG_SELF_CHECK_TIPS_E_HEAT_EN;
+      debug_menu.selfc_tips_bheat                   = DEBUG_SELF_CHECK_TIPS_B_HEAT_EN;
+      debug_menu.selfc_tips_x                       = DEBUG_SELF_CHECK_TIPS_X_MOTOR_EN;
+      debug_menu.selfc_tips_y                       = DEBUG_SELF_CHECK_TIPS_Y_MOTOR_EN;
+      debug_menu.selfc_tips_servo                   = DEBUG_SELF_CHECK_TIPS_3DTPUCH_EN;
+      print_file_dialog_menu.print_again            = DIALOG_PRINT_AGAIN_EN;
+    #endif
     switch (gCfgItems.language) {
       case LANG_SIMPLE_CHINESE:
         adjust_z_menu.title                         = OFFSET_Z_CN;
@@ -2917,15 +2962,42 @@ void disp_language_init() {
         filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_CN;
         filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_CN;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_CN;
+        filament_menu.filament_clogging_title       = FILAMENT_DIALOG_BREAK_TITLE_CN;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_CN;
         leveling_menu.z_offset                      = OFFSET_Z_CN;
         operation_menu.filament_sensor_on           = FILAMENT_SENSOR_ON_CN;
         operation_menu.filament_sensor_off          = FILAMENT_SENSOR_OFF_CN;
-        machine_menu.FilamentConfTitle              = FILAMENT_DIALOG_BREAK_TITLE_CN;
         machine_menu.FilamentDetPausing             = FILAMENT_DIALOG_BREAKING_CN;
         filament_temp_select.title                  = PRINTING_TEMP_CN;
         set_menu.axisztest                          = AXIS_TEST_Z_CN;
         set_menu.axisztesting                       = AXIS_TESTING_Z_CN;
+        #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+          machine_menu.PIDTempConf                    = PIDTEMP_SW_TITLE_CN;
+          pidtemp_sw_menu.title                       = PIDTEMP_SW_TITLE_CN;
+          pidtemp_sw_menu.normal                      = PIDTEMP_SW_NMODEL_CN;
+          pidtemp_sw_menu.high                        = PIDTEMP_SW_HMODEL_CN;
+          pidtemp_sw_menu.n_model                     = PIDTEMP_SW_NMODEL_CUR_CN;
+          pidtemp_sw_menu.h_model                     = PIDTEMP_SW_HMODEL_CUR_CN;
+          pidtemp_sw_menu.normal_confirm              = PIDTEMP_SW_NMODEL_TIP_CN;
+          pidtemp_sw_menu.high_confirm                = PIDTEMP_SW_HMODEL_TIP_CN;
+          filament_temp_select.temp_mode              = HIGH_HEAT_MODE_CN;
+          filament_temp_select.temp_mode_tips         = HIGH_HEAT_MODE_TIPS_CN;
+          filament_temp_select.temp_adjust            = FILAMENT_ADJUST_TEMP_CN;
+          debug_menu.zaxis_title                      = AXIS_TEST_Z_CN;
+          debug_menu.selfc_title                      = DEBUG_SELF_CHECK_TITLE_CN;
+          debug_menu.selfc_confirm                    = DEBUG_SELF_CHECK_CONFIRM_CN;
+          debug_menu.selfc_checking                   = DEBUG_SELF_CHECK_CHECKING_CN;
+          debug_menu.zaxis_slow                       = DEBUG_SELF_CHECK_AXIS_SLOW_CN;
+          debug_menu.zaxis_fast                       = DEBUG_SELF_CHECK_AXIS_FAST_CN;
+          debug_menu.selfc_tips_etemp                 = DEBUG_SELF_CHECK_TIPS_E_TEMP_CN;
+          debug_menu.selfc_tips_btemp                 = DEBUG_SELF_CHECK_TIPS_B_TEMP_CN;
+          debug_menu.selfc_tips_eheat                 = DEBUG_SELF_CHECK_TIPS_E_HEAT_CN;
+          debug_menu.selfc_tips_bheat                 = DEBUG_SELF_CHECK_TIPS_B_HEAT_CN;
+          debug_menu.selfc_tips_x                     = DEBUG_SELF_CHECK_TIPS_X_MOTOR_CN;
+          debug_menu.selfc_tips_y                     = DEBUG_SELF_CHECK_TIPS_Y_MOTOR_CN;
+          debug_menu.selfc_tips_servo                 = DEBUG_SELF_CHECK_TIPS_3DTPUCH_CN;
+          print_file_dialog_menu.print_again          = DIALOG_PRINT_AGAIN_CN;
+        #endif
         break;
       case LANG_COMPLEX_CHINESE:
         adjust_z_menu.title                         = OFFSET_Z_T_CN;
@@ -2942,15 +3014,42 @@ void disp_language_init() {
         filament_menu.filament_dialog_load_select   = FILAMENT_DIALOG_LOAD_SELECT_TIPS_T_CN;
         filament_menu.filament_dialog_unload_select = FILAMENT_DIALOG_UNLOAD_SELECT_TIPS_T_CN;
         filament_menu.filament_clogging             = FILAMENT_DIALOG_CLOGGING_T_CN;
+        filament_menu.filament_clogging_title       = FILAMENT_DIALOG_BREAK_TITLE_T_CN;
         home_menu.motor_off                         = MOTOR_OFF_TEXT_T_CN;
         leveling_menu.z_offset                      = OFFSET_Z_T_CN;
         operation_menu.filament_sensor_on           = FILAMENT_SENSOR_ON_T_CN;
         operation_menu.filament_sensor_off          = FILAMENT_SENSOR_OFF_T_CN;
-        machine_menu.FilamentConfTitle              = FILAMENT_DIALOG_BREAK_TITLE_T_CN;
         machine_menu.FilamentDetPausing             = FILAMENT_DIALOG_BREAKING_T_CN;
         filament_temp_select.title                  = PRINTING_TEMP_T_CN;
         set_menu.axisztest                          = AXIS_TEST_Z_T_CN;
         set_menu.axisztesting                       = AXIS_TESTING_Z_T_CN;
+        #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+          machine_menu.PIDTempConf                    = PIDTEMP_SW_TITLE_T_CN;
+          pidtemp_sw_menu.title                       = PIDTEMP_SW_TITLE_T_CN;
+          pidtemp_sw_menu.normal                      = PIDTEMP_SW_NMODEL_T_CN;
+          pidtemp_sw_menu.high                        = PIDTEMP_SW_HMODEL_T_CN;
+          pidtemp_sw_menu.n_model                     = PIDTEMP_SW_NMODEL_CUR_T_CN;
+          pidtemp_sw_menu.h_model                     = PIDTEMP_SW_HMODEL_CUR_T_CN;
+          pidtemp_sw_menu.normal_confirm              = PIDTEMP_SW_NMODEL_TIP_T_CN;
+          pidtemp_sw_menu.high_confirm                = PIDTEMP_SW_HMODEL_TIP_T_CN;
+          filament_temp_select.temp_mode              = HIGH_HEAT_MODE_T_CN;
+          filament_temp_select.temp_mode_tips         = HIGH_HEAT_MODE_TIPS_T_CN;
+          filament_temp_select.temp_adjust            = FILAMENT_ADJUST_TEMP_T_CN;
+          debug_menu.zaxis_title                      = AXIS_TEST_Z_T_CN;
+          debug_menu.selfc_title                      = DEBUG_SELF_CHECK_TITLE_T_CN;
+          debug_menu.selfc_confirm                    = DEBUG_SELF_CHECK_CONFIRM_T_CN;
+          debug_menu.selfc_checking                   = DEBUG_SELF_CHECK_CHECKING_T_CN;
+          debug_menu.zaxis_slow                       = DEBUG_SELF_CHECK_AXIS_SLOW_T_CN;
+          debug_menu.zaxis_fast                       = DEBUG_SELF_CHECK_AXIS_FAST_T_CN;
+          debug_menu.selfc_tips_etemp                 = DEBUG_SELF_CHECK_TIPS_E_TEMP_T_CN;
+          debug_menu.selfc_tips_btemp                 = DEBUG_SELF_CHECK_TIPS_B_TEMP_T_CN;
+          debug_menu.selfc_tips_eheat                 = DEBUG_SELF_CHECK_TIPS_E_HEAT_T_CN;
+          debug_menu.selfc_tips_bheat                 = DEBUG_SELF_CHECK_TIPS_B_HEAT_T_CN;
+          debug_menu.selfc_tips_x                     = DEBUG_SELF_CHECK_TIPS_X_MOTOR_T_CN;
+          debug_menu.selfc_tips_y                     = DEBUG_SELF_CHECK_TIPS_Y_MOTOR_T_CN;
+          debug_menu.selfc_tips_servo                 = DEBUG_SELF_CHECK_TIPS_3DTPUCH_T_CN;
+          print_file_dialog_menu.print_again          = DIALOG_PRINT_AGAIN_T_CN;
+        #endif
         break;
       case LANG_RUSSIAN:
         adjust_z_menu.title                         = OFFSET_Z_RU;

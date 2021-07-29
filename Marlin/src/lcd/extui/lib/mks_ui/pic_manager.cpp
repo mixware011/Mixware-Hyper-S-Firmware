@@ -112,7 +112,9 @@ static const char assets[][LONG_FILENAME_LENGTH] = {
   "img_eeprom.bin",
   "img_about.bin",
   "img_machine_para.bin",
-  "img_axis_z_test.bin",
+  "img_axis_z_test_s.bin",
+  "img_axis_z_test_f.bin",
+  "img_self_check.bin",
 
   //lang select screen
   #if HAS_LANG_SELECT_SCREEN
@@ -138,12 +140,8 @@ static const char assets[][LONG_FILENAME_LENGTH] = {
   "img_speed_high.bin",
 
   //select file screen
-  "img_page_up.bin",
-  "img_page_down.bin",
   "img_dir.bin",
   "img_file.bin",
-  "img_dir2.bin",
-  "img_file2.bin",
 
   //extrusion screen
   "img_speed_normal.bin",
@@ -153,25 +151,17 @@ static const char assets[][LONG_FILENAME_LENGTH] = {
   "img_run_out.bin",
   "img_run_out_on.bin",
   "img_run_out_off.bin",
-  //"img_Mamual.bin", //TODO: didn't find it.. changed to bmp_manual_off.bin
-  "img_temp.bin",
-  "img_extrude_opr.bin",
-  "img_move_opr.bin",
 
   //change speed screen
   "img_step_percent_1.bin",
   "img_step_percent_5.bin",
   "img_step_percent_10.bin",
-  "img_mov_changespeed.bin",
-  "img_mov_sel.bin",
-  "img_speed_extruct.bin",
 
   //printing screen
   "bmp_pause.bin",
   "bmp_resume.bin",
   "bmp_stop.bin",
   "bmp_ext_state.bin",
-  "bmp_ext2_state.bin",
   "bmp_bed_state.bin",
   "bmp_fan_state.bin",
   "bmp_time_state.bin",
@@ -186,16 +176,21 @@ static const char assets[][LONG_FILENAME_LENGTH] = {
   #if HAS_LOGO_IN_FLASH
     "bmp_logo.bin",
   #endif
-
-  // settings screen
-
   //base icons
   "bmp_arrow.bin",
-  "bmp_value_blank.bin",
-  "bmp_blank_sel.bin",
-  "bmp_disable.bin",
-  "bmp_enable.bin",
-  "img_null.bin"
+  "img_null.bin",
+
+  // settings screen
+  "img_normal_mode.bin",
+
+  //HIGH MODE screen
+  "HI_high_mode.bin",
+  "HI_printing.bin",
+  "HI_preheat.bin",
+  "HI_extruct.bin",
+  "HI_ext_state.bin",
+  "HI_mode_tip.bin"
+
 #else
   //homing screen
   "bmp_zeroAll.bin",

@@ -43,7 +43,7 @@ static lv_obj_t
                 *buttonGcode[FILE_BTN_CNT], *labelPageUp[FILE_BTN_CNT], *buttonText[FILE_BTN_CNT];
 
 enum {
-  ID_P_UP = 7,
+  ID_P_UP = (FILE_BTN_CNT + 1),
   ID_P_DOWN,
   ID_P_RETURN
 };
@@ -224,9 +224,10 @@ void lv_draw_print_file(void) {
 
   list_file.Sd_file_offset = dir_offset[curDirLever].cur_page_first_offset;
   #if ENABLED(SDSUPPORT)
-    card.mount();
+    // card.mount();
     file_count = search_file();
   #endif
+
   disp_gcode_icon(file_count);
 
   //lv_obj_t *labelPageUp = lv_label_create_empty(buttonPageUp);
@@ -292,6 +293,7 @@ void disp_gcode_icon(uint8_t file_num) {
     }
     */
     if (i >= file_num) break;
+    watchdog_refresh();
 
     #ifdef TFT35
       buttonGcode[i] = lv_imgbtn_create(scr, nullptr);
@@ -305,12 +307,14 @@ void disp_gcode_icon(uint8_t file_num) {
 
       if (list_file.IsFolder[i]) {
         lv_obj_set_event_cb_mks(buttonGcode[i], event_handler, (i + 1), "", 0);
-        lv_imgbtn_set_src_both(buttonGcode[i], TERN(MIXWARE_MODEL_V, "F:/img_dir2.bin", "F:/bmp_dir.bin"));
+        lv_imgbtn_set_src_both(buttonGcode[i], TERN(MIXWARE_MODEL_V, "F:/img_dir.bin", "F:/bmp_dir.bin"));
 
         #if ENABLED(MIXWARE_MODEL_V)
-          lv_obj_set_pos(buttonGcode[i], 0, titleHeight + 76 * i + INTERVAL_V * (i + 1));
-          labelPageUp[i] = lv_label_create(buttonGcode[i], public_buf_m);
-          lv_obj_align(labelPageUp[i], buttonGcode[i], LV_ALIGN_IN_LEFT_MID, 84, 5);
+          if (i < FILE_BTN_CNT) {
+            lv_obj_set_pos(buttonGcode[i], 0, titleHeight + 76 * i + INTERVAL_V * (i + 1));
+            labelPageUp[i] = lv_label_create(buttonGcode[i], public_buf_m);
+            lv_obj_align(labelPageUp[i], buttonGcode[i], LV_ALIGN_IN_LEFT_MID, 84, 5);
+          }
         #else
           if (i < 3)
             lv_obj_set_pos(buttonGcode[i], BTN_X_PIXEL * i + INTERVAL_V * (i + 1), titleHeight);
@@ -345,7 +349,7 @@ void disp_gcode_icon(uint8_t file_num) {
               lv_obj_set_pos(buttonText[i], BTN_X_PIXEL * i + INTERVAL_V * (i + 1) + FILE_PRE_PIC_X_OFFSET, titleHeight + FILE_PRE_PIC_Y_OFFSET + 100);
               lv_obj_set_size(buttonText[i], 100, 40);
             }
-            else {
+            else if (i < FILE_BTN_CNT){
               lv_obj_set_pos(buttonGcode[i], BTN_X_PIXEL * (i - 3) + INTERVAL_V * ((i - 3) + 1) + FILE_PRE_PIC_X_OFFSET, BTN_Y_PIXEL + INTERVAL_H + titleHeight + FILE_PRE_PIC_Y_OFFSET);
               buttonText[i] = lv_btn_create(scr, nullptr);
               //lv_obj_set_event_cb(buttonText[i], event_handler);
@@ -363,12 +367,14 @@ void disp_gcode_icon(uint8_t file_num) {
         }
         else {
           lv_obj_set_event_cb_mks(buttonGcode[i], event_handler, (i + 1), "", 0);
-          lv_imgbtn_set_src_both(buttonGcode[i], TERN(MIXWARE_MODEL_V, "F:/img_file2.bin", "F:/bmp_file.bin"));
+          lv_imgbtn_set_src_both(buttonGcode[i], TERN(MIXWARE_MODEL_V, "F:/img_file.bin", "F:/bmp_file.bin"));
 
           #if ENABLED(MIXWARE_MODEL_V)
-            lv_obj_set_pos(buttonGcode[i], 0, titleHeight + 76 * i + INTERVAL_V * (i + 1));
-            labelPageUp[i] = lv_label_create(buttonGcode[i], public_buf_m);
-            lv_obj_align(labelPageUp[i], buttonGcode[i], LV_ALIGN_IN_LEFT_MID, 84, 5);
+            if (i < FILE_BTN_CNT) {
+              lv_obj_set_pos(buttonGcode[i], 0, titleHeight + 76 * i + INTERVAL_V * (i + 1));
+              labelPageUp[i] = lv_label_create(buttonGcode[i], public_buf_m);
+              lv_obj_align(labelPageUp[i], buttonGcode[i], LV_ALIGN_IN_LEFT_MID, 84, 5);
+            }
           #else
             if (i < 3)
               lv_obj_set_pos(buttonGcode[i], BTN_X_PIXEL * i + INTERVAL_V * (i + 1), titleHeight);

@@ -37,6 +37,9 @@ enum {
   ID_WIFI_PARA,
   ID_FILAMENT_SETTINGS,
   ID_ENCODER_SETTINGS
+  #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+    ,ID_PIDTEMP_SETTINGS
+  #endif
 };
 
 static void event_handler(lv_obj_t *obj, lv_event_t event) {
@@ -66,6 +69,12 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
         lv_draw_encoder_settings();
         break;
     #endif
+    #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+      case ID_PIDTEMP_SETTINGS:
+        lv_clear_advance_settings();
+        lv_draw_pidtemp_switch();
+        break;
+    #endif
   }
 }
 
@@ -75,6 +84,9 @@ void lv_draw_advance_settings(void) {
   int index = 0;
   lv_screen_menu_item(scr, machine_menu.PausePosition, PARA_UI_POS_X, PARA_UI_POS_Y * (index + 1), event_handler, ID_PAUSE_POS, index++);
   lv_screen_menu_item(scr, machine_menu.FilamentConf, PARA_UI_POS_X, PARA_UI_POS_Y * (index + 1), event_handler, ID_FILAMENT_SETTINGS, index++);
+  #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+    lv_screen_menu_item(scr, machine_menu.PIDTempConf, PARA_UI_POS_X, PARA_UI_POS_Y * (index + 1), event_handler, ID_PIDTEMP_SETTINGS, index++);
+  #endif
   #if ENABLED(MKS_WIFI_MODULE)
     lv_screen_menu_item(scr, machine_menu.WifiSettings, PARA_UI_POS_X, PARA_UI_POS_Y * (index + 1), event_handler, ID_WIFI_PARA, index++);
   #endif

@@ -183,6 +183,11 @@ void lv_draw_change_speed(void) {
   printSpeedText = lv_label_create_empty(scr);
   lv_obj_set_style(printSpeedText, &tft_style_label_rel);
   disp_print_speed();
+
+  lv_obj_t *l_tips_type = lv_label_create(buttonType, machine_menu.ButtonTips);
+  lv_obj_align(l_tips_type, buttonType, LV_ALIGN_IN_BOTTOM_MID, 0, 2);
+  lv_obj_t *l_tips_step = lv_label_create(buttonStep, machine_menu.ButtonTips);
+  lv_obj_align(l_tips_step, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, 2);
 }
 
 void disp_speed_step() {
@@ -196,15 +201,15 @@ void disp_speed_step() {
   if (gCfgItems.multiple_language) {
     if (uiCfg.stepPrintSpeed == 1) {
       lv_label_set_text(labelStep, speed_menu.step_1percent);
-      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
     else if (uiCfg.stepPrintSpeed == 5) {
       lv_label_set_text(labelStep, speed_menu.step_5percent);
-      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
     else if (uiCfg.stepPrintSpeed == 10) {
       lv_label_set_text(labelStep, speed_menu.step_10percent);
-      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
   }
 }
@@ -250,11 +255,11 @@ void disp_print_speed() {
 
 void disp_speed_type() {
   #if ENABLED(MIXWARE_MODEL_V)
-    lv_imgbtn_set_src_both(buttonType, editingFlowrate ? "F:/img_extruct.bin" : "F:/img_move.bin");
+    lv_imgbtn_set_src_both(buttonType, editingFlowrate ? (gCfgItems.filament_max_temper < 300 ? "F:/img_extruct.bin" : "F:/HI_extruct.bin") : "F:/img_move.bin");
     lv_obj_refresh_ext_draw_pad(buttonType);
     if (gCfgItems.multiple_language) {
       lv_label_set_text(labelType, editingFlowrate ? speed_menu.extrude : speed_menu.move);
-      lv_obj_align(labelType, buttonType, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+      lv_obj_align(labelType, buttonType, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
   #else
     lv_imgbtn_set_src_both(buttonMov, editingFlowrate ? "F:/bmp_mov_changeSpeed.bin" : "F:/bmp_mov_sel.bin");

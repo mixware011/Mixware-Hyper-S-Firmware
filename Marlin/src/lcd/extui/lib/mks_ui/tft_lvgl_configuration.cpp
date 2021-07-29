@@ -159,7 +159,7 @@ void tft_lvgl_init() {
 
   lv_init();
 
-  lv_disp_buf_init(&disp_buf, bmp_public_buf, nullptr, LV_HOR_RES_MAX * 14); /*Initialize the display buffer*/
+  lv_disp_buf_init(&disp_buf, bmp_public_buf, nullptr, LV_HOR_RES_MAX * 15); /*Initialize the display buffer*/
 
   lv_disp_drv_t disp_drv;     /*Descriptor of a display driver*/
   lv_disp_drv_init(&disp_drv);    /*Basic initialization*/

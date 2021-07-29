@@ -76,6 +76,7 @@ void printer_state_polling() {
       }
       uiCfg.print_state = PAUSED;
       uiCfg.current_e_position_bak = current_position.e;
+      uiCfg.moveSpeed_bak = feedrate_mm_s;
 
       gCfgItems.pause_reprint = true;
       update_spi_flash();
@@ -90,6 +91,8 @@ void printer_state_polling() {
     #if ENABLED(MIXWARE_MODEL_V)
       // planner.synchronize();  //can not add.
       if (uiCfg.dialogType == DIALOG_RUNOUT_PAUSING) {
+        uiCfg.moveSpeed_bak = feedrate_mm_s;
+        uiCfg.desireSprayerTempBak = thermalManager.temp_hotend[0].target;
         lv_clear_cur_ui();
         lv_draw_dialog(DIALOG_RUNOUT_UNLOAD);
       }

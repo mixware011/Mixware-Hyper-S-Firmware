@@ -76,6 +76,9 @@
 #include "draw_baby_stepping.h"
 #include "draw_keyboard.h"
 #include "draw_encoder_settings.h"
+#include "draw_pidtemp_switch.h"
+#include "draw_debug_self_check.h"
+#include "draw_debug_z_axis.h"
 
 #include "../../../../inc/MarlinConfigPre.h"
 
@@ -286,6 +289,7 @@ typedef struct {
   float pausePosY;
   float pausePosZ;
   uint32_t curFilesize;
+  int   filament_max_temper;
 } CFG_ITMES;
 
 typedef struct {
@@ -306,6 +310,7 @@ typedef struct {
           filament_unloading_time_flg:1,
           curSprayerChoose_bak:4;
   uint8_t tmc_connect_state:1;
+  uint8_t debug_zaxis_speed:1;
   uint8_t wifi_name[32];
   uint8_t wifi_key[64];
   uint8_t cloud_hostUrl[96];
@@ -387,6 +392,9 @@ typedef enum {
   TERN_(MIXWARE_MODEL_V, FILAMENT_TEMPERATURE_SELECT_UI),
   TERN_(MIXWARE_MODEL_V, LEVEL_SELECT_UI),
   TERN_(MIXWARE_MODEL_V, ADJUST_Z_OFFSET_UI),
+  TERN_(MIXWARE_MODEL_V, PIDTEMP_SW_UI),
+  TERN_(MIXWARE_MODEL_V, DEBUG_ZAXIS_UI),
+  TERN_(MIXWARE_MODEL_V, DEBUG_SELFC_UI),
   LEVELING_SETTIGNS_UI,
   LEVELING_PARA_UI,
   DELTA_LEVELING_PARA_UI,
@@ -491,7 +499,8 @@ typedef enum {
   x_sensitivity,
   y_sensitivity,
   z_sensitivity,
-  z2_sensitivity
+  z2_sensitivity,
+  filament_temp_set
 } num_key_value_state;
 extern num_key_value_state value;
 
@@ -510,10 +519,10 @@ extern keyboard_value_state keyboard_value;
   #include "draw_filament_temperature_select.h"
 
   #undef TFT_LV_PARA_BACK_BODY_COLOR
-  #define TFT_LV_PARA_BACK_BODY_COLOR  LV_COLOR_MAKE(0xF1, 0x5A, 0x20)
+  #define TFT_LV_PARA_BACK_BODY_COLOR  LV_COLOR_MAKE(0xF1, 0x5A, 0x20)//LV_COLOR_MAKE(0x29, 0xAB, 0xE2)
   #undef FILE_BTN_CNT
   #define FILE_BTN_CNT              5
-  #define UNLOAD_PRELOAD_TIME       (MMS_TO_MMM(10) / 100) // MMS_TO_MMM(lenght) / speed
+  #define UNLOAD_PRELOAD_TIME       (MMS_TO_MMM(15) / 100) // MMS_TO_MMM(lenght) / speed
 
   typedef enum {
     LEVEL_STATE_NULL,
@@ -539,6 +548,7 @@ extern DISP_STATE_STACK disp_state_stack;
 extern lv_style_t tft_style_scr;
 extern lv_style_t tft_style_label_pre;
 extern lv_style_t tft_style_label_rel;
+extern lv_style_t tft_style_label_HT;
 extern lv_style_t style_line;
 extern lv_style_t style_para_value_pre;
 extern lv_style_t style_para_value_rel;
@@ -548,6 +558,7 @@ extern lv_style_t style_num_text;
 extern lv_style_t style_sel_text;
 extern lv_style_t style_para_value;
 extern lv_style_t style_para_back;
+extern lv_style_t style_para_button;
 extern lv_style_t lv_bar_style_indic;
 extern lv_style_t style_btn_pr;
 extern lv_style_t style_btn_rel;
@@ -600,6 +611,8 @@ lv_obj_t* lv_label_create_empty(lv_obj_t *par);
 // Create a label with style and text
 lv_obj_t* lv_label_create(lv_obj_t *par, const char *text);
 
+lv_obj_t* lv_label_create(lv_obj_t *par, const char *text, const bool is);
+
 // Create a label with style, position, and text
 lv_obj_t* lv_label_create(lv_obj_t *par, lv_coord_t x, lv_coord_t y, const char *text);
 
@@ -641,6 +654,8 @@ lv_obj_t* lv_big_button_create(lv_obj_t *par, const char *img, const char *text,
 
 // Create a menu item, follow the LVGL UI standard.
 lv_obj_t* lv_screen_menu_item(lv_obj_t *par, const char *text, lv_coord_t x, lv_coord_t y, lv_event_cb_t cb, const int id, const int index, bool drawArrow = true);
+
+lv_obj_t* lv_screen_menu_item(lv_obj_t *par, const char *text, lv_coord_t x, lv_coord_t y, lv_event_cb_t cb, const int id);
 
 lv_obj_t*  lv_screen_menu_item_onoff(lv_obj_t *par, const char *text, lv_coord_t x, lv_coord_t y, lv_event_cb_t cb, const int id, const int index, const bool curValue);
 

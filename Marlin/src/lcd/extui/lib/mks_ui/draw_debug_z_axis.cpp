@@ -28,39 +28,47 @@
 
 #include "../../../../inc/MarlinConfig.h"
 
+
 extern lv_group_t *g;
 static lv_obj_t *scr;
-static lv_obj_t *fw_type, *board;
 
-enum { ID_A_RETURN = 1 };
+enum {
+  ID_DEBUG_Z_LOW = 1,
+  ID_DEBUG_Z_FAST,
+  ID_DEBUG_Z_RETURN
+};
 
 static void event_handler(lv_obj_t *obj, lv_event_t event) {
   if (event != LV_EVENT_RELEASED) return;
+  lv_clear_cur_ui();
   switch (obj->mks_obj_id) {
-    case ID_A_RETURN:
-      lv_clear_cur_ui();
+    case ID_DEBUG_Z_LOW:
+      uiCfg.leveling_first_time = 1;
+      uiCfg.debug_zaxis_speed = 0;
+      lv_draw_dialog(DIALOG_AXIS_Z_TEST_WAIT_START);
+      break;
+    case ID_DEBUG_Z_FAST:
+      uiCfg.leveling_first_time = 1;
+      uiCfg.debug_zaxis_speed = 1;
+      lv_draw_dialog(DIALOG_AXIS_Z_TEST_WAIT_START);
+      break;
+    case ID_DEBUG_Z_RETURN:
       lv_draw_return_ui();
       break;
   }
 }
 
-void lv_draw_about(void) {
-  scr = lv_screen_create(ABOUT_UI, about_menu.title);
+void lv_draw_debug_zaxis(void) {
+  scr = lv_screen_create(DEBUG_ZAXIS_UI);
 
-  #if ENABLED(MIXWARE_MODEL_V)
-    lv_screen_menu_item_return(scr, event_handler, ID_A_RETURN);
-  #else
-    lv_big_button_create(scr, "F:/bmp_return.bin", common_menu.text_back, BTN_X_PIXEL * 3 + INTERVAL_V * 4, BTN_Y_PIXEL + INTERVAL_H + titleHeight, event_handler, ID_A_RETURN);
-  #endif
+  // Create an Image button
+  lv_big_button_create(scr, "F:/img_axis_z_test_s.bin",  debug_menu.zaxis_slow,  button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_DEBUG_Z_LOW);
+  lv_big_button_create(scr, "F:/img_axis_z_test_f.bin", debug_menu.zaxis_fast, button_pixel_point[3].x, button_pixel_point[3].y, event_handler, ID_DEBUG_Z_FAST);
 
-  fw_type = lv_label_create(scr, "Firmware: Hyper-S " SHORT_BUILD_VERSION);
-  lv_obj_align(fw_type, nullptr, LV_ALIGN_CENTER, 0, -20);
-
-  board = lv_label_create(scr, "Board:  " BOARD_INFO_NAME);
-  lv_obj_align(board, nullptr, LV_ALIGN_CENTER, 0, -60);
+  lv_screen_menu_item_return(scr, event_handler, ID_DEBUG_Z_RETURN);
 }
 
-void lv_clear_about() {
+void lv_clear_debug_zaxis() {
   #if HAS_ROTARY_ENCODER
     if (gCfgItems.encoder_enable) lv_group_remove_all_objs(g);
   #endif

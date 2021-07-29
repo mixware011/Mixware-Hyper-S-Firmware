@@ -28,6 +28,7 @@
 #include "tft_Language_fr.h"
 #include "tft_Language_sp.h"
 #include "tft_Language_it.h"
+#include "pic_manager.h"
 
 extern void disp_language_init();
 
@@ -292,6 +293,8 @@ typedef struct machine_common_disp{
   TERN_(MIXWARE_MODEL_V, const char *RunoutConfText;)
   TERN_(MIXWARE_MODEL_V, const char *FilamentDetTitle;)
   TERN_(MIXWARE_MODEL_V, const char *FilamentDetPausing;)
+  TERN_(MIXWARE_MODEL_V, const char *PIDTempConf;)
+  TERN_(MIXWARE_MODEL_V, const char *ButtonTips;)
 } machine_common_def;
 
 extern machine_common_def machine_menu;
@@ -571,6 +574,7 @@ typedef struct filament_menu_disp {
   TERN_(MIXWARE_MODEL_V, const char *filament_dialog_load_select;)
   TERN_(MIXWARE_MODEL_V, const char *filament_dialog_unload_select;)
   TERN_(MIXWARE_MODEL_V, const char *filament_clogging;)
+  TERN_(MIXWARE_MODEL_V, const char *filament_clogging_title);
 } filament_menu_def;
 
 extern filament_menu_def filament_menu;
@@ -704,6 +708,7 @@ typedef struct print_file_dialog_disp {
   const char *reprint;
   const char *wifi_enable_tips;
   const char *machinePausingTips;
+  const char *print_again;
 } print_file_dialog_menu_def;
 
 extern print_file_dialog_menu_def print_file_dialog_menu;
@@ -855,14 +860,25 @@ extern eeprom_def eeprom_menu;
   #define TEXT_5C             "5℃"
   #define TEXT_10C            "10℃"
   #define TEXT_5MM            "5 mm"
+  #define TEMP_170            "170"
+  #define TEMP_180            "180"
+  #define TEMP_190            "190"
   #define TEMP_200            "200"
   #define TEMP_210            "210"
-  #define TEMP_220            "220 (PLA)"
+  #define TEMP_220            "220"
   #define TEMP_230            "230"
   #define TEMP_240            "240"
-  #define TEMP_250            "250 (ABS)"
+  #define TEMP_250            "250"
   #define TEMP_260            "260"
   #define TEMP_270            "270"
+  #define TEMP_280            "280"
+  #define TEMP_290            "290"
+  #define TEMP_300            "300"
+  #define TEMP_310            "310"
+  #define TEMP_320            "320"
+  #define TEMP_330            "330"
+  #define TEMP_340            "340"
+  #define TEMP_350            "350"
 
   typedef struct adjust_z_menu_disp {
     const char *title;
@@ -882,6 +898,9 @@ extern eeprom_def eeprom_menu;
 
   typedef struct filament_temp_select_disp {
     const char *title;
+    const char *temp_170;
+    const char *temp_180;
+    const char *temp_190;
     const char *temp_200;
     const char *temp_210;
     const char *temp_220;
@@ -890,7 +909,48 @@ extern eeprom_def eeprom_menu;
     const char *temp_250;
     const char *temp_260;
     const char *temp_270;
+    const char *temp_280;
+    const char *temp_290;
+    const char *temp_300;
+    const char *temp_310;
+    const char *temp_320;
+    const char *temp_330;
+    const char *temp_340;
+    const char *temp_350;
+    const char *temp_mode;
+    const char *temp_mode_tips;
+    const char *temp_adjust;
   } filament_temp_select_def;
+
+  #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+    typedef struct pidtemp_sw_menu_disp {
+      const char *title;
+      const char *normal;
+      const char *high;
+      const char *n_model;
+      const char *h_model;
+      const char *normal_confirm;
+      const char *high_confirm;
+    } pidtemp_sw_menu_def;
+    extern pidtemp_sw_menu_def pidtemp_sw_menu;
+
+    typedef struct debug_menu_disp {
+      const char *zaxis_title;
+      const char *zaxis_slow;
+      const char *zaxis_fast;
+      const char *selfc_title;
+      const char *selfc_confirm;
+      const char *selfc_checking;
+      const char *selfc_tips_etemp;
+      const char *selfc_tips_btemp;
+      const char *selfc_tips_eheat;
+      const char *selfc_tips_bheat;
+      const char *selfc_tips_x;
+      const char *selfc_tips_y;
+      const char *selfc_tips_servo;
+    } debug_menu_def;
+    extern debug_menu_def debug_menu;
+  #endif
 
   extern adjust_z_menu_def adjust_z_menu;
   extern autolevel_menu_def autolevel_menu;

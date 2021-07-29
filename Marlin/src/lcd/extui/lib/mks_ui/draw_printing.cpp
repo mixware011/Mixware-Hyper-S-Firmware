@@ -137,7 +137,7 @@ void lv_draw_printing(void) {
 
   // Create image buttons
   lv_obj_t *buttonExt1 = lv_img_create(scr, nullptr);
-  lv_img_set_src(buttonExt1, TERN(MIXWARE_MODEL_V, "F:/bmp_ext2_state.bin", "F:/bmp_ext1_state.bin"));
+  lv_img_set_src(buttonExt1, TERN(MIXWARE_MODEL_V, (gCfgItems.filament_max_temper < 300 ? "F:/bmp_ext_state.bin" : "F:/HI_ext_state.bin"), "F:/bmp_ext1_state.bin"));
   lv_obj_set_pos(buttonExt1, TERN(MIXWARE_MODEL_V, 165, 205), TERN(MIXWARE_MODEL_V, 170, 136));
 
   #if DISABLED(SINGLENOZZLE) && HAS_MULTI_EXTRUDER
@@ -199,15 +199,23 @@ void lv_draw_printing(void) {
   labelOperat = lv_label_create_empty(buttonOperat);
   TERN_(MIXWARE_MODEL_V, labelDet = lv_label_create_empty(buttonDet));
 
+  if (gCfgItems.filament_max_temper > 300) {
+    lv_obj_t *b_mode = lv_img_create(scr, nullptr);
+    lv_img_set_src(b_mode, "F:/HI_mode_tip.bin");
+    lv_obj_set_pos(b_mode, 20, 285);
+    lv_obj_t *l_mode = lv_label_create(b_mode, filament_temp_select.temp_mode, true);
+    lv_obj_align(l_mode, b_mode, LV_ALIGN_CENTER, 0, 0);
+  }
+
   if (gCfgItems.multiple_language) {
     lv_label_set_text(labelPause, uiCfg.print_state == WORKING ? printing_menu.pause : printing_menu.resume);
-    lv_obj_align(labelPause, buttonPause, LV_ALIGN_CENTER, 20, 0);
+    lv_obj_align(labelPause, buttonPause, LV_ALIGN_CENTER, 18, 0);
 
     lv_label_set_text(labelStop, printing_menu.stop);
-    lv_obj_align(labelStop, buttonStop, LV_ALIGN_CENTER, 20, 0);
+    lv_obj_align(labelStop, buttonStop, LV_ALIGN_CENTER, 18, 0);
 
     lv_label_set_text(labelOperat, printing_menu.option);
-    lv_obj_align(labelOperat, buttonOperat, LV_ALIGN_CENTER, 20, 0);
+    lv_obj_align(labelOperat, buttonOperat, LV_ALIGN_CENTER, 18, 0);
 
     #if ENABLED(MIXWARE_MODEL_V)
       lv_label_set_text(labelDet, gCfgItems.filament_det_enable ? operation_menu.filament_sensor_on : operation_menu.filament_sensor_off);

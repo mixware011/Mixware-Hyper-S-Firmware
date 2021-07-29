@@ -73,7 +73,7 @@ extern bool temps_update_flag;
 
 static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
   if (event != LV_EVENT_RELEASED) return;
-  if (DIALOG_IS(TYPE_PRINT_FILE)) {
+  if (DIALOG_IS(TYPE_PRINT_FILE, TYPE_FINISH_PRINT)) {
     #if HAS_GCODE_PREVIEW
       preview_gcode_prehandle(list_file.file_name[sel_id]);
     #endif
@@ -114,6 +114,9 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
             return;
           }
 
+          gcode.process_subcommands_now(PSTR("M140 S50"));//TEST
+          gcode.process_subcommands_now(PSTR("M104 S170"));//TEST
+
           reset_print_time();
           start_print_time();
           planner.set_e_position_mm(destination.e = current_position.e = 0);
@@ -127,19 +130,16 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
     #endif
   }
   else if (DIALOG_IS(TYPE_STOP)) {
-    WRITE(BEEPER_PIN, LOW);
+    detector.reset();
     wait_for_heatup = false;
     stop_print_time();
-    lv_clear_dialog();
-    lv_draw_ready_print();
 
     #if ENABLED(SDSUPPORT)
       uiCfg.print_state           = IDLE;
       card.flag.abort_sd_printing = true;
     #endif
-  }
-  else if (DIALOG_IS(TYPE_FINISH_PRINT)) {
-    lv_clear_cur_ui();
+
+    lv_clear_dialog();
     lv_draw_ready_print();
   }
   #if ENABLED(ADVANCED_PAUSE_FEATURE)
@@ -182,11 +182,15 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
     lv_clear_cur_ui();
     lv_draw_return_ui();
   }
-  else if (DIALOG_IS(TYPE_FILAMENT_HEAT_LOAD_COMPLETED))
+  else if (DIALOG_IS(TYPE_FILAMENT_HEAT_LOAD_COMPLETED)) {
     uiCfg.filament_heat_completed_load = 1;
-  else if (DIALOG_IS(TYPE_FILAMENT_HEAT_UNLOAD_COMPLETED))
+  }
+  else if (DIALOG_IS(TYPE_FILAMENT_HEAT_UNLOAD_COMPLETED)) {
     uiCfg.filament_heat_completed_unload = 1;
+  }
   else if (DIALOG_IS(TYPE_FILAMENT_LOAD_COMPLETED, TYPE_FILAMENT_UNLOAD_COMPLETED)) {
+    thermalManager.temp_hotend[uiCfg.curSprayerChoose].target= uiCfg.desireSprayerTempBak;
+    thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
     lv_clear_cur_ui();
     lv_draw_filament_change();
   }
@@ -269,6 +273,37 @@ static void btn_ok_event_cb(lv_obj_t *btn, lv_event_t event) {
         lv_draw_return_ui();
       }
     #endif
+    #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+      else if (DIALOG_IS(TYPE_FILAMENT_LOAD_HEAT, TYPE_FILAMENT_UNLOAD_HEAT)) {
+        if (uiCfg.filament_load_heat_flg == 1 || uiCfg.filament_unload_heat_flg == 1 ) {
+          value = filament_temp_set;
+          lv_clear_dialog();
+          lv_draw_number_key();
+        }
+      }
+      else if (DIALOG_IS(PIDTEMP_SW_NORMAL)) {
+        // temp_range[0].maxtemp = 285;
+        // while (analog_to_celsius_hotend(temp_range[0].raw_max, 0) > tmax)
+        //   temp_range[0].raw_max -= TEMPDIR(0) * (OVERSAMPLENR);
+
+        gcode.process_subcommands_now_P(PSTR("M301 P13.14 I0.85 D55.20\nM500"));
+        gCfgItems.filament_max_temper = 260;
+        update_spi_flash();
+        lv_clear_cur_ui();
+        lv_draw_return_ui();
+      }
+      else if (DIALOG_IS(PIDTEMP_SW_HIGH)) {
+        // temp_range[0].maxtemp = 375;
+        // while (analog_to_celsius_hotend(temp_range[0].raw_max, 0) > tmax)
+        //   temp_range[0].raw_max -= TEMPDIR(0) * (OVERSAMPLENR);
+
+        gcode.process_subcommands_now_P(PSTR("M301 P20.30 I1.23 D57.77\nM500"));
+        gCfgItems.filament_max_temper = 350;
+        update_spi_flash();
+        lv_clear_cur_ui();
+        lv_draw_return_ui();
+      }
+    #endif
   #endif
   else {
     lv_clear_cur_ui();
@@ -285,7 +320,8 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
     thermalManager.temp_hotend[uiCfg.curSprayerChoose].target= uiCfg.desireSprayerTempBak;
     thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
     lv_clear_cur_ui();
-    lv_draw_return_ui();
+    lv_draw_filament_change();
+    // lv_draw_return_ui();
   }
   else if (DIALOG_IS(TYPE_FILAMENT_LOADING, TYPE_FILAMENT_UNLOADING)) {
     queue.enqueue_one_P(PSTR("M410"));
@@ -299,7 +335,8 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
     thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = uiCfg.desireSprayerTempBak;
     thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
     lv_clear_cur_ui();
-    lv_draw_return_ui();
+    lv_draw_filament_change();
+    // lv_draw_return_ui();
   }
   #if ENABLED(MIXWARE_MODEL_V)
     else if (DIALOG_IS(RUNOUT_FINISH)) {
@@ -361,6 +398,13 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
         lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_HEAT);
       }
     }
+    else if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_COMPLETED)) {
+      if (uiCfg.print_state != IDLE) {
+        uiCfg.filament_load_heat_flg = 1;
+        lv_clear_filament_change();
+        lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_SELECT);
+      }
+    }
     #if HAS_ABL_NOT_UBL
       else if (DIALOG_IS(AUTO_LEVELING)) {
 
@@ -374,10 +418,26 @@ static void btn_cancel_event_cb(lv_obj_t *btn, lv_event_t event) {
       }
     #endif
     else if (DIALOG_IS(AXIS_Z_TEST)) {
-      queue.enqueue_one_P(PSTR("M410"));
-      lv_clear_dialog();
-      lv_draw_set();
+      if (!all_axes_trusted()) {
+        queue.enqueue_one_P(PSTR("M410"));
+      }
+      else {
+        gcode.process_subcommands_now(PSTR("M410"));
+      }
+
+      lv_clear_cur_ui();
+      lv_draw_return_ui();
     }
+    #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+      else if (DIALOG_IS(PIDTEMP_SW_NORMAL, PIDTEMP_SW_HIGH)) {
+        lv_clear_cur_ui();
+        lv_draw_return_ui();
+      }
+      else if (DIALOG_IS(TYPE_FINISH_PRINT)) {
+        lv_clear_cur_ui();
+        lv_draw_ready_print();
+      }
+    #endif
   #endif
   else {
     lv_clear_cur_ui();
@@ -390,7 +450,13 @@ static void btn_more_event_cb(lv_obj_t *btn, lv_event_t event) {
   if (event != LV_EVENT_RELEASED) return;
   if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_SELECT, TYPE_FILAMENT_LOAD_SELECT)) {
     lv_clear_dialog();
+    uiCfg.para_ui_page = 0;
     lv_draw_filament_temperature_select();
+  }
+  if ((uiCfg.filament_load_heat_flg == 1 || uiCfg.filament_unload_heat_flg == 1) && DIALOG_IS(TYPE_FILAMENT_LOAD_HEAT, TYPE_FILAMENT_UNLOAD_HEAT)) {
+    value = filament_temp_set;
+    lv_clear_dialog();
+    lv_draw_number_key();
   }
 }
 
@@ -418,10 +484,19 @@ void lv_draw_dialog(uint8_t type) {
     lv_obj_set_pos(buttonNull,  0, TFT_HEIGHT - 50);
   #endif
 
-  if (DIALOG_IS(TYPE_FINISH_PRINT, PAUSE_MESSAGE_RESUME)) {
-      btnOk = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_CENTER_X, (BTN_OK_X + 90)), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_OK_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_ok_event_cb);
-      lv_obj_t *labelOk = lv_label_create_empty(btnOk);             // Add a label to the button
-      lv_label_set_text(labelOk, print_file_dialog_menu.confirm);    // Set the labels text
+  if (DIALOG_IS(TYPE_FINISH_PRINT)) {
+    btnOk = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_LEFT_X, BTN_OK_X), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_OK_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_ok_event_cb);
+    lv_obj_t *labelOk = lv_label_create_empty(btnOk);             // Add a label to the button
+    lv_label_set_text(labelOk, print_file_dialog_menu.print_again);    // Set the labels text
+
+    btnCancel = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_RIGHT_X, BTN_CANCEL_X), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_CANCEL_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_cancel_event_cb);
+    lv_obj_t *labelCancel = lv_label_create_empty(btnCancel);
+    lv_label_set_text(labelCancel, print_file_dialog_menu.confirm);
+  }
+  else if (DIALOG_IS(PAUSE_MESSAGE_RESUME)) {
+    btnOk = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_CENTER_X, (BTN_OK_X + 90)), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_OK_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_ok_event_cb);
+    lv_obj_t *labelOk = lv_label_create_empty(btnOk);             // Add a label to the button
+    lv_label_set_text(labelOk, print_file_dialog_menu.confirm);
   }
   else if (DIALOG_IS(PAUSE_MESSAGE_WAITING, PAUSE_MESSAGE_INSERT, PAUSE_MESSAGE_HEAT)) {
     btnOk = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_CENTER_X, (BTN_OK_X + 90)), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_OK_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_ok_event_cb);
@@ -459,17 +534,39 @@ void lv_draw_dialog(uint8_t type) {
     }
   #endif
   else if (DIALOG_IS(TYPE_FILAMENT_LOAD_HEAT, TYPE_FILAMENT_UNLOAD_HEAT)) {
-    btnCancel = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_CENTER_X, (BTN_OK_X + 90)), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_OK_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_cancel_event_cb);
+    btnOk = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_LEFT_X, BTN_OK_X), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_OK_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_ok_event_cb);
+    lv_obj_t *labelAdjustTemp = lv_label_create_empty(btnOk);             // Add a label to the button
+    lv_label_set_text(labelAdjustTemp, filament_temp_select.temp_adjust);
+
+    btnCancel = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_RIGHT_X, BTN_CANCEL_X), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_CANCEL_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_cancel_event_cb);
     lv_obj_t *labelCancel = lv_label_create_empty(btnCancel);
     lv_label_set_text(labelCancel, print_file_dialog_menu.cancel);
+
+      // lv_obj_t *buttont = lv_btn_create(scr, nullptr);
+      // lv_obj_set_pos(buttont, TFT_WIDTH/4, TFT_HEIGHT/2-70);
+      // lv_obj_set_size(buttont, TFT_WIDTH/2, PARA_UI_SIZE_Y);
+      // lv_obj_set_event_cb_mks(buttont, btn_more_event_cb, 0, "", 0);
+      // lv_btn_use_label_style(buttont);
+      // lv_btn_set_layout(buttont, LV_LAYOUT_OFF);
 
     tempText1 = lv_label_create(scr, "");
     filament_sprayer_temp();
   }
   else if (DIALOG_IS(TYPE_FILAMENT_LOAD_COMPLETED, TYPE_FILAMENT_UNLOAD_COMPLETED)) {
-    btnOk = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_CENTER_X, (BTN_OK_X + 90)), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_OK_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_ok_event_cb);
-    lv_obj_t *labelOk = lv_label_create_empty(btnOk);
-    lv_label_set_text(labelOk, print_file_dialog_menu.confirm);
+    if (DIALOG_IS(TYPE_FILAMENT_UNLOAD_COMPLETED) && uiCfg.print_state != IDLE) {
+      btnOk = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_LEFT_X, BTN_OK_X), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_OK_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_ok_event_cb);
+      lv_obj_t *labelAdjustTemp = lv_label_create_empty(btnOk);             // Add a label to the button
+      lv_label_set_text(labelAdjustTemp, print_file_dialog_menu.confirm);
+
+      btnCancel = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_RIGHT_X, BTN_CANCEL_X), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_CANCEL_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_cancel_event_cb);
+      lv_obj_t *labelCancel = lv_label_create_empty(btnCancel);
+      lv_label_set_text(labelCancel, filament_menu.in);
+    }
+    else {
+      btnOk = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_CENTER_X, (BTN_OK_X + 90)), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_OK_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_ok_event_cb);
+      lv_obj_t *labelOk = lv_label_create_empty(btnOk);
+      lv_label_set_text(labelOk, print_file_dialog_menu.confirm);
+    }
   }
   else if (DIALOG_IS(TYPE_FILAMENT_LOADING, TYPE_FILAMENT_UNLOADING)) {
     btnCancel = lv_button_btn_create(scr, TERN(MIXWARE_MODEL_V, BTN_CENTER_X, (BTN_OK_X + 90)), TERN(MIXWARE_MODEL_V, BTN_POS_Y, BTN_OK_Y), TERN(MIXWARE_MODEL_V, BTN_SIZE_WIDTH, 100), TERN(MIXWARE_MODEL_V, BTN_SIZE_HEIGHT, 50), btn_cancel_event_cb);
@@ -492,7 +589,7 @@ void lv_draw_dialog(uint8_t type) {
       lv_obj_t *labelOk = lv_label_create_empty(btnOk);
       lv_label_set_text(labelOk, print_file_dialog_menu.confirm);
     }
-    else if (DIALOG_IS(RUNOUT_PAUSING, TYPE_FILAMENT_PAUSING, TYPE_FILAMENT_WAIT_START, ADJUST_Z_HEIGHT_WAIT_START)) {
+    else if (DIALOG_IS(RUNOUT_PAUSING, TYPE_FILAMENT_PAUSING, TYPE_FILAMENT_WAIT_START, ADJUST_Z_HEIGHT_WAIT_START, AXIS_Z_TEST_WAIT_START)) {
       //nothing to do
     }
     else if (DIALOG_IS(RUNOUT_UNLOAD, RUNOUT_LOAD)) {
@@ -701,7 +798,7 @@ void lv_draw_dialog(uint8_t type) {
   #endif // MKS_WIFI_MODULE
   else if (DIALOG_IS(TYPE_FILAMENT_LOAD_HEAT)) {
     lv_label_set_text(labelDialog, filament_menu.filament_dialog_load_heat);
-    lv_obj_align(labelDialog, nullptr, LV_ALIGN_CENTER, 0, -20);
+    lv_obj_align(labelDialog, nullptr, LV_ALIGN_CENTER, 0, -15);
   }
   else if (DIALOG_IS(TYPE_FILAMENT_HEAT_LOAD_COMPLETED)) {
     lv_label_set_text(labelDialog, filament_menu.filament_dialog_load_heat_confirm);
@@ -754,7 +851,7 @@ void lv_draw_dialog(uint8_t type) {
       lv_label_set_text(labelDialog, print_file_dialog_menu.no_file_print_tips);
       lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -70);
     }
-    else if (DIALOG_IS(ADJUST_Z_HEIGHT_WAIT_START)) {
+    else if (DIALOG_IS(ADJUST_Z_HEIGHT_WAIT_START, AXIS_Z_TEST_WAIT_START)) {
       lv_label_set_text(labelDialog, adjust_z_menu.wait_start);
       lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
     }
@@ -774,7 +871,7 @@ void lv_draw_dialog(uint8_t type) {
       lv_label_set_text(labelDialog, filament_menu.filament_dialog_load_heat_confirm);
       lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
 
-      lv_obj_t * label_Det_title = lv_label_create(scr, machine_menu.FilamentConfTitle);
+      lv_obj_t * label_Det_title = lv_label_create(scr, filament_menu.filament_clogging_title);
       lv_obj_set_style(label_Det_title, &tft_style_label_rel);
       lv_obj_align(label_Det_title, nullptr, LV_ALIGN_CENTER, 0, -70);
     }
@@ -782,7 +879,7 @@ void lv_draw_dialog(uint8_t type) {
       lv_label_set_text(labelDialog, filament_menu.filament_dialog_loading);
       lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
 
-      lv_obj_t * label_Det_title = lv_label_create(scr, machine_menu.FilamentConfTitle);
+      lv_obj_t * label_Det_title = lv_label_create(scr, filament_menu.filament_clogging_title);
       lv_obj_set_style(label_Det_title, &tft_style_label_rel);
       lv_obj_align(label_Det_title, nullptr, LV_ALIGN_CENTER, 0, -70);
     }
@@ -790,7 +887,7 @@ void lv_draw_dialog(uint8_t type) {
       lv_label_set_text(labelDialog, filament_menu.filament_dialog_unloading);
       lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
 
-      lv_obj_t * label_Det_title = lv_label_create(scr, machine_menu.FilamentConfTitle);
+      lv_obj_t * label_Det_title = lv_label_create(scr, filament_menu.filament_clogging_title);
       lv_obj_set_style(label_Det_title, &tft_style_label_rel);
       lv_obj_align(label_Det_title, nullptr, LV_ALIGN_CENTER, 0, -70);
     }
@@ -798,7 +895,7 @@ void lv_draw_dialog(uint8_t type) {
       lv_label_set_text(labelDialog, pause_msg_menu.option);
       lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
 
-      lv_obj_t * label_Det_title = lv_label_create(scr, machine_menu.FilamentConfTitle);
+      lv_obj_t * label_Det_title = lv_label_create(scr, filament_menu.filament_clogging_title);
       lv_obj_set_style(label_Det_title, &tft_style_label_rel);
       lv_obj_align(label_Det_title, nullptr, LV_ALIGN_CENTER, 0, -70);
     }
@@ -828,6 +925,16 @@ void lv_draw_dialog(uint8_t type) {
       lv_label_set_text(labelDialog, set_menu.axisztesting);
       lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
     }
+    #if (FLASH_INF_VALID_FLAG >= 0x20210629)
+      else if (DIALOG_IS(PIDTEMP_SW_NORMAL)) {
+        lv_label_set_text(labelDialog, pidtemp_sw_menu.normal_confirm);
+        lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
+      }
+      else if (DIALOG_IS(PIDTEMP_SW_HIGH)) {
+        lv_label_set_text(labelDialog, pidtemp_sw_menu.high_confirm);
+        lv_obj_align(labelDialog, NULL, LV_ALIGN_CENTER, 0, -20);
+      }
+    #endif
   #endif
 
   #if HAS_ROTARY_ENCODER
@@ -847,7 +954,7 @@ void filament_sprayer_temp() {
   strcat_P(public_buf_l, PSTR(": "));
   strcat(public_buf_l, buf);
   lv_label_set_text(tempText1, public_buf_l);
-  lv_obj_align(tempText1, nullptr, LV_ALIGN_CENTER, 0, -50);
+  lv_obj_align(tempText1, nullptr, LV_ALIGN_CENTER, 0, -70);
 }
 
 void filament_dialog_handle() {
@@ -863,10 +970,12 @@ void filament_dialog_handle() {
         if (uiCfg.leveling_first_time) {
           uiCfg.leveling_first_time = 0;
           if (!all_axes_trusted())
-            gcode.process_subcommands_now_P(PSTR("G28"));
+            queue.enqueue_now_P(PSTR("G28"));
+          if (uiCfg.print_state == IDLE)
+            queue.enqueue_now_P(PSTR("G1 X5 Y0 Z50 F600"));
         }
         else {
-          if (all_axes_trusted()) {
+          if (all_axes_trusted() && !planner.has_blocks_queued()) {
             lv_clear_dialog();
             if (uiCfg.filament_load_heat_flg) {
               lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_HEAT);
@@ -901,7 +1010,7 @@ void filament_dialog_handle() {
     planner.synchronize();
     uiCfg.filament_unloading_time_flg = 1;
     uiCfg.filament_unloading_time_cnt = 0;
-    sprintf_P(public_buf_m, PSTR("T%d\nG91\nG1 E10 F100\nG1 E-%d F%d\nG90"), uiCfg.curSprayerChoose, gCfgItems.filamentchange_unload_length, gCfgItems.filamentchange_unload_speed);
+    sprintf_P(public_buf_m, PSTR("T%d\nG91\nG1 E15 F100\nG1 E-%d F%d\nG90"), uiCfg.curSprayerChoose, gCfgItems.filamentchange_unload_length, gCfgItems.filamentchange_unload_speed);
     queue.inject(public_buf_m);
   }
 
@@ -914,10 +1023,8 @@ void filament_dialog_handle() {
   ) {
     uiCfg.filament_load_heat_flg = 0;
     #if ENABLED(MIXWARE_MODEL_V)
-      if (uiCfg.print_state == IDLE)
-        queue.inject_P(PSTR("G1 X5 Y0 Z50 F2000"));
-      // else
-      //   queue.inject_P(PSTR("G1 X5 Y0 F2000"));
+      // if (uiCfg.print_state == IDLE)
+      //   queue.inject_P(PSTR("G1 X5 Y0 Z50 F600"));
     #endif
     lv_clear_dialog();
     lv_draw_dialog(DIALOG_TYPE_FILAMENT_HEAT_LOAD_COMPLETED);
@@ -926,6 +1033,8 @@ void filament_dialog_handle() {
   if (uiCfg.filament_loading_completed == 1) {
     uiCfg.filament_rate = 0;
     uiCfg.filament_loading_completed = 0;
+    thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = 0;
+    thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
     lv_clear_dialog();
     lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_COMPLETED);
   }
@@ -938,10 +1047,8 @@ void filament_dialog_handle() {
   ) {
     uiCfg.filament_unload_heat_flg = 0;
     #if ENABLED(MIXWARE_MODEL_V)
-      if (uiCfg.print_state == IDLE)
-        queue.inject_P(PSTR("G1 X5 Y0 Z50 F2000"));
-      // else
-      //   queue.inject_P(PSTR("G1 X0 Y0 F2000"));
+      // if (uiCfg.print_state == IDLE)
+      //   queue.inject_P(PSTR("G1 X5 Y0 Z50 F600"));
 
       uiCfg.filament_heat_completed_unload = 1;
     #else
@@ -953,6 +1060,8 @@ void filament_dialog_handle() {
   if (uiCfg.filament_unloading_completed == 1) {
     uiCfg.filament_rate = 0;
     uiCfg.filament_unloading_completed = 0;
+    thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = 0;
+    thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
     lv_clear_dialog();
     lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_COMPLETED);
   }
@@ -976,14 +1085,32 @@ void lv_clear_dialog() {
 void axis_z_test_dialog_handle() {
 	if(axis_z_test_start_flag) {
 		axis_z_test_start_flag = false;
-    if (DIALOG_IS(AXIS_Z_TEST)) {
+    if (DIALOG_IS(AXIS_Z_TEST_WAIT_START)) {
       if (uiCfg.leveling_first_time) {
         uiCfg.leveling_first_time = 0;
-        if (!all_axes_trusted()) gcode.process_subcommands_now(PSTR("G28"));
-        gcode.process_subcommands_now_P(PSTR("G1 X150 Y100 F2000\nG1 Z399 F300\nG1 Z1 F300"));
+        if (!all_axes_trusted())
+          gcode.process_subcommands_now_P(PSTR("G28"));
       }
       else {
-        if (all_axes_trusted() && current_position.z == 1 && !stepper.axis_is_moving(Z_AXIS)) {
+        if (all_axes_trusted() && !planner.has_blocks_queued()) {
+          lv_clear_dialog();
+          uiCfg.leveling_first_time = 1;
+          lv_draw_dialog(DIALOG_AXIS_Z_TEST);
+        }
+      }
+    }
+    else if (DIALOG_IS(AXIS_Z_TEST)) {
+      if (uiCfg.leveling_first_time) {
+        uiCfg.leveling_first_time = 0;
+
+        if (uiCfg.debug_zaxis_speed) {
+          gcode.process_subcommands_now_P(PSTR("G1 X150 Y100 F2000\nG1 Z399 F1500\nG1 Z1 F1500"));
+        } else {
+          gcode.process_subcommands_now_P(PSTR("G1 X150 Y100 F2000\nG1 Z399 F200\nG1 Z1 F200"));
+        }
+      }
+      else {
+        if (all_axes_trusted() && !planner.has_blocks_queued()) {
           uiCfg.leveling_first_time = 1;
         }
       }
@@ -1017,7 +1144,7 @@ void auto_leveling_dialog_handle() {
         uiCfg.leveling_first_time = 0;
         if (!all_axes_trusted()) queue.enqueue_now_P(PSTR("G28"));
         queue.enqueue_now_P(PSTR("G1 X150 Y150 F3000"));
-        queue.enqueue_now_P(PSTR("G1 Z0 F300"));
+        queue.enqueue_now_P(PSTR("G1 Z0 F500"));
       }
       else {
         if (all_axes_trusted() && current_position.z == 0) {

@@ -284,6 +284,9 @@ static void disp_key_value() {
         sprintf_P(public_buf_m, PSTR("%d"), TERN(Z2_SENSORLESS, stepperZ2.homing_threshold(), 0));
       #endif
       break;
+    case filament_temp_set:
+      sprintf_P(public_buf_m, PSTR("%d"), thermalManager.temp_hotend[uiCfg.curSprayerChoose].target);
+      break;
   }
 
   strcpy(key_value, public_buf_m);
@@ -296,6 +299,16 @@ static void disp_key_value() {
 }
 
 static void set_value_confirm() {
+
+  if (value == filament_temp_set ) {
+    int temper = atoi(key_value);
+    NOLESS(temper, 0);
+    NOMORE(temper, gCfgItems.filament_max_temper);
+    gCfgItems.filament_limit_temper = thermalManager.temp_hotend[0].target = temper;
+    thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
+    return;
+  }
+
   #if HAS_TRINAMIC_CONFIG
     uint16_t current_mA;
   #endif
@@ -487,6 +500,8 @@ static void set_value_confirm() {
     #endif
     case load_length:
       gCfgItems.filamentchange_load_length = atoi(key_value);
+      if (gCfgItems.filamentchange_load_length >= EXTRUDE_MAXLENGTH)
+        gCfgItems.filamentchange_load_length = EXTRUDE_MAXLENGTH;
       uiCfg.filament_loading_time = (uint32_t)((gCfgItems.filamentchange_load_length*60.0/gCfgItems.filamentchange_load_speed)+0.5);
       update_spi_flash();
       break;
@@ -497,12 +512,14 @@ static void set_value_confirm() {
       break;
     case unload_length:
       gCfgItems.filamentchange_unload_length = atoi(key_value);
-      uiCfg.filament_unloading_time = (uint32_t)((gCfgItems.filamentchange_unload_length*60.0/gCfgItems.filamentchange_unload_speed)+0.5);
+      if (gCfgItems.filamentchange_unload_length >= EXTRUDE_MAXLENGTH)
+        gCfgItems.filamentchange_unload_length = EXTRUDE_MAXLENGTH;
+      uiCfg.filament_unloading_time = (uint32_t)((TERN_(MIXWARE_MODEL_V, UNLOAD_PRELOAD_TIME+)gCfgItems.filamentchange_unload_length*60.0/gCfgItems.filamentchange_unload_speed)+0.5);
       update_spi_flash();
       break;
     case unload_speed:
       gCfgItems.filamentchange_unload_speed = atoi(key_value);
-      uiCfg.filament_unloading_time = (uint32_t)((gCfgItems.filamentchange_unload_length*60.0/gCfgItems.filamentchange_unload_speed)+0.5);
+      uiCfg.filament_unloading_time = (uint32_t)((TERN_(MIXWARE_MODEL_V, UNLOAD_PRELOAD_TIME+)gCfgItems.filamentchange_unload_length*60.0/gCfgItems.filamentchange_unload_speed)+0.5);
       update_spi_flash();
       break;
     case filament_temp:
@@ -652,6 +669,14 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
     case ID_NUM_CONFIRM:
       last_disp_state = NUMBER_KEY_UI;
       if (strlen(key_value) != 0) set_value_confirm();
+      if (value == filament_temp_set) {
+        lv_clear_number_key();
+        if (uiCfg.filament_load_heat_flg)
+          lv_draw_dialog(DIALOG_TYPE_FILAMENT_LOAD_HEAT);
+        else if (uiCfg.filament_unload_heat_flg)
+          lv_draw_dialog(DIALOG_TYPE_FILAMENT_UNLOAD_HEAT);
+        break;
+      }
       lv_clear_number_key();
       lv_draw_return_ui();
       break;

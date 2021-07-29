@@ -907,7 +907,14 @@ G29_TYPE GcodeSuite::G29() {
   #ifdef Z_PROBE_END_SCRIPT
     if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPAIR("Z Probe End Script: ", Z_PROBE_END_SCRIPT);
     planner.synchronize();
-    process_subcommands_now_P(PSTR(Z_PROBE_END_SCRIPT));
+    #if ENABLED(MIXWARE_MODEL_V)
+      if (level_state == LEVEL_STATE_FINISHED)
+        process_subcommands_now_P(PSTR(Z_PROBE_END_SCRIPT));
+      else
+        process_subcommands_now_P(PSTR("G28"));
+    #else
+      process_subcommands_now_P(PSTR(Z_PROBE_END_SCRIPT));
+    #endif
   #endif
 
   #if ENABLED(DWIN_CREALITY_LCD)

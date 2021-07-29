@@ -39,7 +39,7 @@ static lv_obj_t * *labelP;
 static lv_task_t *updatePosTask;
 #endif
 static char cur_label = 'Z';
-static float cur_pos = 0;
+float cur_pos = 0;
 
 #if ENABLED(MIXWARE_MODEL_V)
   static lv_obj_t *labelAxis, *buttonAxis;
@@ -156,16 +156,16 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       if (queue.length <= (BUFSIZE - 3)) {
         switch (uiCfg.move_axis) {
           case X_AXIS:
-            if ((cur_pos = current_position.x + uiCfg.move_dist) > X_MAX_POS) cur_pos = X_MAX_POS;
-            sprintf_P(public_buf_l, PSTR("G1 X%3.1f F%d"), cur_pos, uiCfg.moveSpeed);
+            if ((cur_pos = current_position[X_AXIS] + uiCfg.move_dist) > X_MAX_POS) cur_pos = X_MAX_POS;
+            sprintf_P(public_buf_l, PSTR("G1 X%s F%d"), dtostrf(cur_pos, 1, 3, str_1), uiCfg.moveSpeed);
             break;
           case Y_AXIS:
-            if ((cur_pos = current_position.y + uiCfg.move_dist) > Y_MAX_POS) cur_pos = Y_MAX_POS;
-            sprintf_P(public_buf_l, PSTR("G1 Y%3.1f F%d"), cur_pos, uiCfg.moveSpeed);
+            if ((cur_pos = current_position[Y_AXIS] + uiCfg.move_dist) > Y_MAX_POS) cur_pos = Y_MAX_POS;
+            sprintf_P(public_buf_l, PSTR("G1 Y%s F%d"), dtostrf(cur_pos, 1, 3, str_1), uiCfg.moveSpeed);
             break;
           case Z_AXIS:
-            if ((cur_pos = current_position.z + uiCfg.move_dist) > Z_MAX_POS) cur_pos = Z_MAX_POS;
-            sprintf_P(public_buf_l, PSTR("G1 Z%3.1f F%d"), cur_pos, uiCfg.moveSpeed / 10);
+            if ((cur_pos = current_position[Z_AXIS] + uiCfg.move_dist) > Z_MAX_POS) cur_pos = Z_MAX_POS;
+            sprintf_P(public_buf_l, PSTR("G1 Z%s F%d"), dtostrf(cur_pos, 1, 3, str_1), uiCfg.moveSpeed/10);
             break;
           default: break;
         }
@@ -176,16 +176,16 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       if (queue.length <= (BUFSIZE - 3)) {
         switch (uiCfg.move_axis) {
           case X_AXIS:
-            if ((cur_pos = current_position.x - uiCfg.move_dist) < X_MIN_POS) cur_pos = X_MIN_POS;
-            sprintf_P(public_buf_l, PSTR("G1 X%3.1f F%d"), cur_pos, uiCfg.moveSpeed);
+            if ((cur_pos = current_position[X_AXIS] - uiCfg.move_dist) < X_MIN_POS) cur_pos = X_MIN_POS;
+            sprintf_P(public_buf_l, PSTR("G1 X%s F%d"), dtostrf(cur_pos, 1, 3, str_1), uiCfg.moveSpeed);
             break;
           case Y_AXIS:
-            if ((cur_pos = current_position.y - uiCfg.move_dist) < Y_MIN_POS) cur_pos = Y_MIN_POS;
-            sprintf_P(public_buf_l, PSTR("G1 Y%3.1f F%d"), cur_pos, uiCfg.moveSpeed);
+            if ((cur_pos = current_position[Y_AXIS] - uiCfg.move_dist) < Y_MIN_POS) cur_pos = Y_MIN_POS;
+            sprintf_P(public_buf_l, PSTR("G1 Y%s F%d"), dtostrf(cur_pos, 1, 3, str_1), uiCfg.moveSpeed);
             break;
           case Z_AXIS:
-            if ((cur_pos = current_position.z - uiCfg.move_dist) < Z_MIN_POS) cur_pos = Z_MIN_POS;
-            sprintf_P(public_buf_l, PSTR("G1 Z%3.1f F%d"), cur_pos, uiCfg.moveSpeed / 10);
+            if ((cur_pos = current_position[Z_AXIS] - uiCfg.move_dist) < Z_MIN_POS) cur_pos = Z_MIN_POS;
+            sprintf_P(public_buf_l, PSTR("G1 Z%s F%d"), dtostrf(cur_pos, 1, 3, str_1), uiCfg.moveSpeed/10);
             break;
         }
         queue.enqueue_one_now(public_buf_l);
@@ -212,9 +212,9 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
 void refresh_pos(lv_task_t *)
 {
   switch(cur_label) {
-    case 'X': cur_pos = current_position.x; break;
-    case 'Y': cur_pos = current_position.y; break;
-    case 'Z': cur_pos = current_position.z; break;
+    case 'X': cur_pos = current_position[X_AXIS]; break;
+    case 'Y': cur_pos = current_position[Y_AXIS]; break;
+    case 'Z': cur_pos = current_position[Z_AXIS]; break;
     default: return;
   }
   disp_cur_pos();
@@ -241,6 +241,10 @@ void lv_draw_move_motor(void) {
       labelV = lv_label_create_empty(buttonV);
       disp_move_axis();
       disp_move_dist();
+      lv_obj_t *l_tips_axis = lv_label_create(buttonAxis, machine_menu.ButtonTips);
+      lv_obj_align(l_tips_axis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, 2);
+      lv_obj_t *l_tips_v = lv_label_create(buttonV, machine_menu.ButtonTips);
+      lv_obj_align(l_tips_v, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, 2);
     }
     else{
       lv_big_button_create(scr, "F:/img_motor_off_all.bin", set_menu.motoroff,  button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_M_OFF_ALL);
@@ -298,17 +302,17 @@ void lv_draw_move_motor(void) {
 
 void disp_cur_pos() {
   #if ENABLED(MIXWARE_MODEL_V)
-        ZERO(public_buf_l);
-    sprintf_P(public_buf_l, PSTR("%.1f"), current_position.x);
+    char str_1[16];
+    sprintf_P(public_buf_l, PSTR("%s mm"), dtostrf(current_position[X_AXIS], 1, 1, str_1));
     if (labelPosX)lv_label_set_text(labelPosX, public_buf_l);
 
-        ZERO(public_buf_l);
-    sprintf_P(public_buf_l, PSTR("%.1f"), current_position.y);
+    ZERO(str_1);
+    sprintf_P(public_buf_l, PSTR("%s mm"), dtostrf(current_position[Y_AXIS], 1, 1, str_1));
     if (labelPosY)lv_label_set_text(labelPosY, public_buf_l);
 
-        ZERO(public_buf_l);
-    sprintf_P(public_buf_l, PSTR("%.1f"), current_position.z);
-    if (labelPosZ)lv_label_set_text(labelPosZ, public_buf_l);
+    ZERO(str_1);
+    sprintf_P(public_buf_l, PSTR("%s mm"), dtostrf(current_position[Z_AXIS], 1, 1, str_1));
+    if (labelPosZ) lv_label_set_text(labelPosZ, public_buf_l);
   #else
     char str_1[16];
     sprintf_P(public_buf_l, PSTR("%c:%s mm"), cur_label, dtostrf(cur_pos, 1, 1, str_1));
@@ -331,20 +335,20 @@ void disp_move_dist() {
   if (gCfgItems.multiple_language) {
     if ((int)(10 * uiCfg.move_dist) == 1) {
       lv_label_set_text(labelV, move_menu.step_01mm);
-      lv_obj_align(labelV, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+      lv_obj_align(labelV, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
     else if ((int)(10 * uiCfg.move_dist) == 10) {
       lv_label_set_text(labelV, move_menu.step_1mm);
-      lv_obj_align(labelV, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+      lv_obj_align(labelV, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
     else if ((int)(10 * uiCfg.move_dist) == 100) {
       lv_label_set_text(labelV, move_menu.step_10mm);
-      lv_obj_align(labelV, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+      lv_obj_align(labelV, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
     #if ENABLED(MIXWARE_MODEL_V)
       else if ((int)(10 * uiCfg.move_dist) == 50) {
         lv_label_set_text(labelV, move_menu.step_5mm);
-        lv_obj_align(labelV, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+        lv_obj_align(labelV, buttonV, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
       }
     #endif
   }
@@ -367,21 +371,21 @@ void disp_move_axis() {
       lv_imgbtn_set_src_both(buttonAxis, "F:/img_axis_x.bin");
       if (gCfgItems.multiple_language) {
         lv_label_set_text(labelAxis, move_menu.x_axis);
-        lv_obj_align(labelAxis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+        lv_obj_align(labelAxis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
       }
     break;
     case Y_AXIS:
       lv_imgbtn_set_src_both(buttonAxis, "F:/img_axis_y.bin");
       if (gCfgItems.multiple_language) {
         lv_label_set_text(labelAxis, move_menu.y_axis);
-        lv_obj_align(labelAxis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+        lv_obj_align(labelAxis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
       }
     break;
     case Z_AXIS:
       lv_imgbtn_set_src_both(buttonAxis, "F:/img_axis_z.bin");
       if (gCfgItems.multiple_language) {
         lv_label_set_text(labelAxis, move_menu.z_axis);
-        lv_obj_align(labelAxis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+        lv_obj_align(labelAxis, buttonAxis, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
       }
     break;
   }

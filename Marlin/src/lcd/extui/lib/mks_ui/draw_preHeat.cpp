@@ -67,8 +67,8 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       if (uiCfg.curTempType == 0) {
         thermalManager.temp_hotend[uiCfg.curSprayerChoose].target += uiCfg.stepHeat;
         if (uiCfg.curSprayerChoose == 0) {
-          if ((int)thermalManager.temp_hotend[uiCfg.curSprayerChoose].target > (HEATER_0_MAXTEMP - (WATCH_TEMP_INCREASE + TEMP_HYSTERESIS + 1))) {
-            thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = (float)HEATER_0_MAXTEMP - (WATCH_TEMP_INCREASE + TEMP_HYSTERESIS + 1);
+          if ((int)thermalManager.temp_hotend[uiCfg.curSprayerChoose].target > gCfgItems.filament_max_temper) {
+            thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = gCfgItems.filament_max_temper;
           }
         }
         #if DISABLED(SINGLENOZZLE) && HAS_MULTI_EXTRUDER
@@ -81,8 +81,8 @@ static void event_handler(lv_obj_t *obj, lv_event_t event) {
       #if HAS_HEATED_BED
         else {
           thermalManager.temp_bed.target += uiCfg.stepHeat;
-          if ((int)thermalManager.temp_bed.target > BED_MAXTEMP - (WATCH_BED_TEMP_INCREASE + TEMP_BED_HYSTERESIS + 1)) {
-            thermalManager.temp_bed.target = (float)BED_MAXTEMP - (WATCH_BED_TEMP_INCREASE + TEMP_BED_HYSTERESIS + 1);
+          if ((int)thermalManager.temp_bed.target > 105) {
+            thermalManager.temp_bed.target = 105.0f;
           }
           thermalManager.start_watching_bed();
         }
@@ -211,6 +211,8 @@ void lv_draw_preHeat(void) {
       // Create labels on the image buttons
       labelType = lv_label_create_empty(buttonType);
       labelStep = lv_label_create_empty(buttonStep);
+      lv_obj_t *l_tips_type = lv_label_create(buttonType, machine_menu.ButtonTips);
+      lv_obj_t *l_tips_step = lv_label_create(buttonStep, machine_menu.ButtonTips);
 
       if (uiCfg.print_state == IDLE) {
         lv_screen_menu_item_turn_page(scr, preheat_menu.title, event_handler, ID_P_SKIP);
@@ -218,6 +220,8 @@ void lv_draw_preHeat(void) {
 
       disp_temp_type();
       disp_step_heat();
+      lv_obj_align(l_tips_type, buttonType, LV_ALIGN_IN_BOTTOM_MID, 0, 2);
+      lv_obj_align(l_tips_step, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, 2);
     }
     else {
       lv_big_button_create(scr, "F:/img_preheat_PLA.bin",  preheat_menu.heatPLA, button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_P_PLA);
@@ -230,7 +234,7 @@ void lv_draw_preHeat(void) {
     lv_screen_menu_item_return(scr, event_handler, ID_P_RETURN);
 
     lv_obj_t *buttonExt = lv_img_create(scr, nullptr);
-    lv_img_set_src(buttonExt, "F:/bmp_ext2_state.bin");
+    lv_img_set_src(buttonExt, (gCfgItems.filament_max_temper < 300 ? "F:/bmp_ext_state.bin" : "F:/HI_ext_state.bin"));
     lv_obj_set_pos(buttonExt, 45, 82);
     labelExt = lv_label_create(scr, 90, 92, nullptr);
 
@@ -279,21 +283,21 @@ void disp_temp_type() {
   if (uiCfg.curTempType == 0) {
     #if DISABLED(SINGLENOZZLE)
       if (uiCfg.curSprayerChoose == 1) {
-        lv_imgbtn_set_src_both(buttonType, TERN(MIXWARE_MODEL_V, "F:/img_extruct.bin", "F:/bmp_extru2.bin"));
+        lv_imgbtn_set_src_both(buttonType, TERN(MIXWARE_MODEL_V, (gCfgItems.filament_max_temper < 300 ? "F:/img_extruct.bin" : "F:/HI_extruct.bin"), "F:/bmp_extru2.bin"));
         if (gCfgItems.multiple_language) {
           lv_label_set_text(labelType, preheat_menu.ext2);
-          lv_obj_align(labelType, buttonType, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+          lv_obj_align(labelType, buttonType, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
         }
       }
       else {
-        lv_imgbtn_set_src_both(buttonType, TERN(MIXWARE_MODEL_V, "F:/img_extruct.bin", "F:/bmp_extru1.bin"));
+        lv_imgbtn_set_src_both(buttonType, TERN(MIXWARE_MODEL_V, (gCfgItems.filament_max_temper < 300 ? "F:/img_extruct.bin" : "F:/HI_extruct.bin"), "F:/bmp_extru1.bin"));
         if (gCfgItems.multiple_language) {
           lv_label_set_text(labelType, preheat_menu.ext1);
-          lv_obj_align(labelType, buttonType, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+          lv_obj_align(labelType, buttonType, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
         }
       }
     #else
-      lv_imgbtn_set_src_both(buttonType, TERN(MIXWARE_MODEL_V, "F:/img_extruct.bin", "F:/bmp_extru1.bin"));
+      lv_imgbtn_set_src_both(buttonType, TERN(MIXWARE_MODEL_V, (gCfgItems.filament_max_temper < 300 ? "F:/img_extruct.bin" : "F:/HI_extruct.bin"), "F:/bmp_extru1.bin"));
       if (gCfgItems.multiple_language) {
         lv_label_set_text(labelType, preheat_menu.ext1);
         lv_obj_align(labelType, buttonType, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
@@ -304,7 +308,7 @@ void disp_temp_type() {
     lv_imgbtn_set_src_both(buttonType, TERN(MIXWARE_MODEL_V, "F:/img_bed.bin", "F:/bmp_bed.bin"));
     if (gCfgItems.multiple_language) {
       lv_label_set_text(labelType, preheat_menu.hotbed);
-      lv_obj_align(labelType, buttonType, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+      lv_obj_align(labelType, buttonType, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
   }
 }
@@ -355,15 +359,15 @@ void disp_step_heat() {
   if (gCfgItems.multiple_language) {
     if (uiCfg.stepHeat == 1) {
       lv_label_set_text(labelStep, preheat_menu.step_1c);
-      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
     else if (uiCfg.stepHeat == 5) {
       lv_label_set_text(labelStep, preheat_menu.step_5c);
-      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
     else if (uiCfg.stepHeat == 10) {
       lv_label_set_text(labelStep, preheat_menu.step_10c);
-      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
   }
 }

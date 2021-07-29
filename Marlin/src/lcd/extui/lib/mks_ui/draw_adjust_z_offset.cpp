@@ -48,6 +48,7 @@ enum {
 };
 
 static void event_handler(lv_obj_t * obj, lv_event_t event) {
+  char str_1[16];
   if (event != LV_EVENT_RELEASED) return;
   switch (obj->mks_obj_id) {
     case ID_ADJUST_Z_ADD:
@@ -61,10 +62,10 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
         else {
           ZERO(public_buf_l);
           queue.enqueue_one_P(PSTR("G91"));
-          sprintf_P(public_buf_l, PSTR("G1 Z%3.1f F300"), uiCfg.move_dist);
+          sprintf_P(public_buf_l, PSTR("G1 Z%s F300"), dtostrf(uiCfg.move_dist, 1, 2, str_1));
           queue.enqueue_one_now(public_buf_l);
           queue.enqueue_one_P(PSTR("G90"));
-          probe.offset.z += uiCfg.move_dist;
+          probe.offset[Z_AXIS] += uiCfg.move_dist;
           disp_z_offset_pos();
         }
       }
@@ -80,10 +81,10 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
         else {
           ZERO(public_buf_l);
           queue.enqueue_one_P(PSTR("G91"));
-          sprintf_P(public_buf_l, PSTR("G1 Z-%3.1f F300"), uiCfg.move_dist);
+          sprintf_P(public_buf_l, PSTR("G1 Z-%s F300"), dtostrf(uiCfg.move_dist, 1, 2, str_1));
           queue.enqueue_one_now(public_buf_l);
           queue.enqueue_one_P(PSTR("G90"));
-          probe.offset.z -= uiCfg.move_dist;
+          probe.offset[Z_AXIS] -= uiCfg.move_dist;
           disp_z_offset_pos();
         }
       }
@@ -93,16 +94,16 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
       lv_draw_dialog(DIALOG_STORE_EEPROM_TIPS);
       break;
     case ID_ADJUST_Z_STEP:
-      if (abs(10 * (int)uiCfg.move_dist) == 10)
+      if ((int)(100 * uiCfg.move_dist) == 5)
         uiCfg.move_dist = 0.1;
       else
-        uiCfg.move_dist = (float)1;
+        uiCfg.move_dist = 0.05;
 
       disp_adjust_dist();
       break;
     case ID_ADJUST_Z_RETURN:
       if (!offset_save_flag)
-        probe.offset.z = z_offset_bak;
+        probe.offset[Z_AXIS] = z_offset_bak;
 
       queue.inject_P(PSTR("G91\nG1 Z10 F300\nG90\nM84"));
       lv_clear_cur_ui();
@@ -113,7 +114,7 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
 
 void lv_draw_adjust_z_offset(void) {
   scr = lv_screen_create(ADJUST_Z_OFFSET_UI);
-  z_offset_bak = probe.offset.z;
+  z_offset_bak = probe.offset[Z_AXIS];
   offset_save_flag = false;
 
   lv_big_button_create(scr, "F:/img_save.bin", adjust_z_menu.save, button_pixel_point[2].x, button_pixel_point[2].y, event_handler, ID_ADJUST_Z_SAVE);
@@ -139,30 +140,36 @@ void lv_draw_adjust_z_offset(void) {
 
   disp_adjust_dist();
   disp_z_offset_pos();
+
+      lv_obj_t *l_tips_step = lv_label_create(buttonStep, machine_menu.ButtonTips);
+      lv_obj_align(l_tips_step, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, 2);
 }
 
 void disp_z_offset_pos() {
-  sprintf_P(public_buf_l, PSTR("%.2f"), probe.offset.z);
+
+  char str_1[16];
+  sprintf_P(public_buf_l, PSTR("%s mm"), dtostrf(probe.offset[Z_AXIS], 1, 2, str_1));
   lv_label_set_text(labelZ_offset, public_buf_l);
+
 }
 
 void disp_adjust_dist() {
-  if ((int)(10 * uiCfg.move_dist) == 1) {
+  if ((int)(100 * uiCfg.move_dist) == 5) {
     lv_imgbtn_set_src(buttonStep, LV_BTN_STATE_REL, "F:/img_step_mm_1.bin");
     lv_imgbtn_set_src(buttonStep, LV_BTN_STATE_PR, "F:/img_step_mm_1.bin");
   }
-  else if ((int)(10 * uiCfg.move_dist) == 10) {
+  else if ((int)(100 * uiCfg.move_dist) == 10) {
     lv_imgbtn_set_src(buttonStep, LV_BTN_STATE_REL, "F:/img_step_mm_10.bin");
     lv_imgbtn_set_src(buttonStep, LV_BTN_STATE_PR, "F:/img_step_mm_10.bin");
   }
   if (gCfgItems.multiple_language != 0) {
-    if ((int)(10 * uiCfg.move_dist) == 1) {
-      lv_label_set_text(labelStep, move_menu.step_01mm);
-      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+    if ((int)(100 * uiCfg.move_dist) == 5) {
+      lv_label_set_text(labelStep, move_menu.step_005mm);
+      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
-    else if ((int)(10 * uiCfg.move_dist) == 10) {
-      lv_label_set_text(labelStep, move_menu.step_1mm);
-      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
+    else if ((int)(100 * uiCfg.move_dist) == 10) {
+      lv_label_set_text(labelStep, move_menu.step_01mm);
+      lv_obj_align(labelStep, buttonStep, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET-10);
     }
   }
 }
